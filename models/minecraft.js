@@ -5,13 +5,34 @@ var Schema = mongoose.Schema,
 
 var MinecraftUser = new Schema({
     name                    : String,
-    name_lower              : String,
+    nameLower              : String,
     uuid                    : String,
 
-    initial_join_date       : Date,
-    last_online_date        : Date,
+    initialJoinDate       : Number,
+    lastOnlineDate        : Number,
 
     ranks                   : [String],
-    ips                     : [String]
+    ips                     : [String],
+
+    kills                   : Number,
+    deaths                  : Number,
+    wins                    : Number,
+    losses                  : Number,
+    matches                 : [ObjectId],
+    ranks                   : [ObjectId]
 });
 mongoose.model('minecraft_user', MinecraftUser);
+
+var MinecraftServer = new Schema({
+    name               : String,
+    nameLower         : String,
+
+    lastOnlineDate        : Number,
+    players            : [ObjectId],
+    playerCount       : Number,
+    spectatorCount    : Number,
+    maxPlayers        : Number,
+    map                : String,
+    gametype           : String
+});
+mongoose.model('minecraft_server', MinecraftServer);
