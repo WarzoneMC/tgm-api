@@ -10,11 +10,12 @@ module.exports = function(app) {
         }, function(err, server) {
             if(err) throw err;
 
-            // console.log('body: ' + JSON.stringify(req.body, null, 2));
+            console.log('body: ' + JSON.stringify(req.body, null, 2));
 
             var data = {
                 name: req.body.name,
                 nameLower: req.body.name.toLowerCase(),
+                id: req.body.id,
                 lastOnline: new Date().getTime(),
                 players: req.body.players,
                 playerCount: req.body.playerCount,
@@ -33,7 +34,10 @@ module.exports = function(app) {
                     res.json({});
                 })
             } else {
-                MinecraftServer.updateOne({name: req.query.name}, {$set: data}, function(err) {
+                MinecraftServer.updateOne({name: req.body.name}, {$set: data}, function(err) {
+                    if(err) {
+                        console.log(err);
+                    }
                     res.json({});
                 })
             }

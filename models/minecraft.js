@@ -26,6 +26,7 @@ mongoose.model('minecraft_user', MinecraftUser);
 var MinecraftServer = new Schema({
     name               : String,
     nameLower         : String,
+    id                 : String,
 
     lastOnlineDate        : Number,
     players            : [ObjectId],
