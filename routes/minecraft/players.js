@@ -86,11 +86,10 @@ module.exports = function(app) {
 
     var matchPlayerWithId = function(players, id) {
         async.eachSeries(players, function(player, next) {
-            if(player._id == id) {
+            if(player._id === id) {
                 console.log('found player [' + player.name + ']')
                 return player;
             } else {
-                console.log('id did not match [' + player.id + '!= ' + id  +']');
                 next();
             }
         }, function(err) {
