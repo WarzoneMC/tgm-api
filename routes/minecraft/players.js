@@ -15,13 +15,12 @@ module.exports = function(app) {
                 res.json({error: true});
             }
             if(user) {
-
                 var deaths = new Array();
                 var matches = new Array();
 
                 async.series([
                     function(callback) {
-                        if(req.body.deaths) {
+                        if(true) {
                             console.log('including deaths in player response.');
                             MinecraftDeath
                                 .find({$or: [{player: user._id}, {killer: user._id}]})
@@ -58,7 +57,7 @@ module.exports = function(app) {
                         }
                     },
                     function(callback) {
-                        if (req.body.matches) {
+                        if (true) {
                             MinecraftMatch
                                 .find({matches: {$in: user.matches}})
                                 .sort('-finishedDate')
