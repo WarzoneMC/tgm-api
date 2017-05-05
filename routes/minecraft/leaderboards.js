@@ -7,7 +7,6 @@ var verifyServer = require('./verifyServer');
 module.exports = function(app) {
 
     app.get('/mc/leaderboard/kills', function(req, res, next) {
-        console.log('kills leaderboard request.');
         MinecraftUser
             .find({})
             .sort("-kills")
