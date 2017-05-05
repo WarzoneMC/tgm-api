@@ -86,7 +86,7 @@ module.exports = function(app) {
 
     var matchPlayerWithId = function(players, id) {
         async.eachSeries(players, function(player, next) {
-            if(player._id === id) {
+            if(player._id.toString() == id.toString()) {
                 console.log('found player [' + player.name + ']')
                 return player;
             } else {
