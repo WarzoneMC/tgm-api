@@ -6,14 +6,26 @@ var verifyServer = require('./verifyServer');
 
 module.exports = function(app) {
 
-    app.get('/:name', function(req, res, next) {
+    app.get('/mc/player/:name', function(req, res, next) {
         MinecraftUser.findOne({nameLower: req.params.name.toLowerCase()}, function(err, user) {
             if(err) {
                 console.log(err);
                 res.json({error: true});
             }
             if(user) {
-                res.json(user);
+                MinecraftDeath
+                    .find({$or: [{player: user._id}, {killer: user._id}]})
+                    .sort('-date')
+                    .limit(20)
+                    .exec(function(err, deaths) {
+                        if(err) {
+                            console.log(err);
+                        }
+                        res.json({
+                            user: user,
+                            deaths: deaths
+                        });
+                    })
             } else {
                 res.json({notFound: true});
             }
@@ -34,7 +46,8 @@ module.exports = function(app) {
                 playerItem: req.body.playerItem,
                 killerItem: req.body.killerItem,
 
-                map: mongoose.Types.ObjectId(req.body.map)
+                map: mongoose.Types.ObjectId(req.body.map),
+                date: new Date()
             });
             death.save(function(err) {
                 if(err) console.log(err);
