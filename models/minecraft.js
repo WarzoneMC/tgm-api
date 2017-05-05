@@ -37,3 +37,24 @@ var MinecraftServer = new Schema({
     gametype           : String
 });
 mongoose.model('minecraft_server', MinecraftServer);
+
+var MinecraftKill = new Schema({
+    player          : ObjectId,
+    target          : ObjectId,
+
+    playerItem      : String,
+    targetItem      : String,
+
+    map             : ObjectId
+});
+mongoose.model('minecraft_kill', MinecraftKill);
+
+var MinecraftMap = new Schema({
+    name            : String,
+    nameLower       : String,
+    version         : String,
+    authors         : [String],
+    thumbnail       : String,
+    images          : [String]
+});
+mongoose.model('minecraft_map', MinecraftMap);

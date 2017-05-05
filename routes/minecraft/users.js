@@ -5,6 +5,9 @@ var MinecraftUser = mongoose.model('minecraft_user');
 var verifyServer = require('./verifyServer');
 
 module.exports = function(app) {
+
+    app.post('/mc/player/kill')
+
     app.post('/mc/player/login', verifyServer, function(req, res) {
         console.log('login request');
         MinecraftUser.findOne({
