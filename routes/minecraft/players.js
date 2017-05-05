@@ -22,6 +22,7 @@ module.exports = function(app) {
                 async.series([
                     function(callback) {
                         if(req.body.deaths) {
+                            console.log('including deaths in player response.');
                             MinecraftDeath
                                 .find({$or: [{player: user._id}, {killer: user._id}]})
                                 .sort('-date')
