@@ -21,6 +21,7 @@ require('./routes/minecraft/players')(app);
 require('./routes/minecraft/servers')(app);
 require('./routes/minecraft/maps')(app);
 require('./routes/minecraft/leaderboards')(app);
+require('./routes/minecraft/matches')(app);
 
 const port = config.port;
 
