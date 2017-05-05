@@ -24,6 +24,8 @@ module.exports = function(app) {
     });
 
     app.post('/mc/match/new', verifyServer, function(req, res) {
+        console.log('match body: ' + JSON.stringify(req.body, null, 2));
+
         async.eachSeries(req.body.chat, function(chat, next) {
             chat.user = mongoose.Types.ObjectId(chat.user);
             next();
