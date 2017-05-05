@@ -62,3 +62,21 @@ var MinecraftMap = new Schema({
     teams           : [{ id: String, name: String, color: String, min: Number, max: Number }]
 });
 mongoose.model('minecraft_map', MinecraftMap);
+
+var MinecraftMatch = new Schema({
+    map             : ObjectId,
+    startedDate     : Date,
+    finishedDate    : Date,
+    chat            : [{
+        user: ObjectId,
+        username: String,
+        message: String,
+        team: String,
+        matchTime: Number
+    }],
+    deaths: [ObjectId],
+    winners: [ObjectId],
+    losers: [ObjectId],
+    winningTeam: String
+});
+mongoose.model('minecraft_match', MinecraftMatch);
