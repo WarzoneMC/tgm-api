@@ -52,7 +52,10 @@ var MinecraftDeath = new Schema({
 
     map             : ObjectId,
 
-    date            : Date
+    date            : Date,
+
+    playerLoaded    : Object,
+    killerLoaded    : Object
 });
 mongoose.model('minecraft_death', MinecraftDeath);
 

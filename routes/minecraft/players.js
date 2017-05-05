@@ -30,8 +30,27 @@ module.exports = function(app) {
                                     if(err) {
                                         console.log(err);
                                     }
-                                    deaths = foundDeaths;
-                                    callback();
+                                    var containing = new Array();
+                                    async.eachSeries(foundDeaths, function(death, next) {
+                                        containing.push(death.player);
+                                        if(death.killer) {
+                                            containing.push(death.killer);
+                                        }
+                                        next();
+                                    }, function(err) {
+                                        MinecraftUser.find({_id: {$in: containing}}, function(err, players) {
+                                            async.eachSeries(foundDeaths, function(death, next) {
+                                                death.playerLoaded = matchPlayerWithId(players, death.player);
+                                                if(death.killer) {
+                                                    death.killerLoaded = matchPlayerWithId(players, death.killer);
+                                                }
+                                                next();
+                                            }, function(err) {
+                                                deaths = foundDeaths;
+                                                callback();
+                                            })
+                                        })
+                                    })
                                 })
                         } else {
                             callback();
@@ -64,6 +83,19 @@ module.exports = function(app) {
             }
         });
     });
+
+    var matchPlayerWithId = function(players, id) {
+        var found = null;
+        async.eachSeries(players, function(player, next) {
+            if(player._id == id) {
+                return found;
+            } else {
+                next();
+            }
+        }, function(err) {
+            return null;
+        })
+    }
 
     app.post('/mc/player/death', verifyServer, function(req, res) {
         if(req.body.map) { //rare cases when the map wasn't loaded.
