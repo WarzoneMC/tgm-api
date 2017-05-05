@@ -8,7 +8,7 @@ var MinecraftMatch = mongoose.model('minecraft_match');
 
 module.exports = function(app) {
 
-    app.post('/mc/player/:name', function(req, res) {
+    app.get('/mc/player/:name', function(req, res, next) {
         MinecraftUser.findOne({nameLower: req.params.name.toLowerCase()}, function(err, user) {
             if(err) {
                 console.log(err);
