@@ -1,33 +1,38 @@
 var mongoose = require("mongoose");
 var User = mongoose.model('user');
 var MinecraftUser = mongoose.model('minecraft_user');
-var MinecraftKill = mongoose.model('minecraft_kill');
+var MinecraftDeath = mongoose.model('minecraft_death');
 var verifyServer = require('./verifyServer');
 
 module.exports = function(app) {
 
-    app.post('/mc/player/kill', verifyServer, function(req, res) {
+    app.post('/mc/player/death', verifyServer, function(req, res) {
         if(req.body.map) { //rare cases when the map wasn't loaded.
-            var kill = new MinecraftKill({
+            var death = new MinecraftDeath({
                 player: mongoose.Types.ObjectId(req.body.player),
-                target: mongoose.Types.ObjectId(req.body.target),
+                killer: mongoose.Types.ObjectId(req.body.killer),
 
                 playerItem: req.body.playerItem,
-                targetItem: req.body.targetItem,
+                killerItem: req.body.killerItem,
 
                 map: mongoose.Types.ObjectId(req.body.map)
             });
-            kill.save(function(err) {
+            death.save(function(err) {
                 if(err) console.log(err);
 
-                MinecraftUser.update({_id: kill.player}, {$inc: {kills: 1}}, function(err2) {
-                    if(err2) console.log(err2);
-
-                    MinecraftUser.update({_id: kill.target}, {$inc: {deaths: 1}}, function(err3) {
-                        if(err3) console.log(err3);
-                        res.json({});
+                if(death.player) {
+                    MinecraftUser.update({_id: death.player}, {$inc: {deaths: 1}}, function(err2) {
+                        if(err2) console.log(err2);
                     });
-                });
+                }
+
+                if(death.killer) {
+                    MinecraftUser.update({_id: death.killer}, {$inc: {kills: 1}}, function(err3) {
+                        if(err3) console.log(err3);
+                    });
+                }
+
+                res.json({});
             });
         }
     });

@@ -38,16 +38,16 @@ var MinecraftServer = new Schema({
 });
 mongoose.model('minecraft_server', MinecraftServer);
 
-var MinecraftKill = new Schema({
+var MinecraftDeath = new Schema({
     player          : ObjectId,
-    target          : ObjectId,
+    killer          : ObjectId,
 
     playerItem      : String,
-    targetItem      : String,
+    killerItem      : String,
 
     map             : ObjectId
 });
-mongoose.model('minecraft_kill', MinecraftKill);
+mongoose.model('minecraft_death', MinecraftDeath);
 
 var MinecraftMap = new Schema({
     name            : String,
