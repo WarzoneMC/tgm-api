@@ -46,7 +46,7 @@ module.exports = function(app) {
                         next();
                     }, function(err) {
                         var match = new MinecraftMatch({
-                            map: mongoose.types.ObjectId(req.body.map),
+                            map: mongoose.Types.ObjectId(req.body.map),
                             startedDate: req.body.startedDate,
                             finishedDate: req.body.finishedDate,
                             chat: req.body.chat,
