@@ -20,6 +20,7 @@ app.use(logger('dev'));
 require('./routes/minecraft/players')(app);
 require('./routes/minecraft/servers')(app);
 require('./routes/minecraft/maps')(app);
+require('./routes/minecraft/leaderboards')(app);
 
 const port = config.port;
 

@@ -58,6 +58,13 @@ module.exports = function(app) {
                             }
                            res.json({matchId: match._id})
                         });
+
+                        MinecraftUser.update({_id: {$in: fixedWinners}}, {$inc: {wins: 1}}, function(err) {
+                            if(err) console.log(err);
+                            MinecraftUser.update({_id: {$in: fixedLosers}}, {$inc: {losses: 1}}, function(err) {
+                                if(err) console.log(err);
+                            })
+                        })
                     })
                 })
             })

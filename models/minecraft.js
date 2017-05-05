@@ -21,6 +21,11 @@ var MinecraftUser = new Schema({
     matches                 : [ObjectId],
     ranks                   : [ObjectId]
 });
+MinecraftUser.methods.toJSON = function() {
+    var obj = this.toObject();
+    delete obj.password;
+    return obj;
+};
 mongoose.model('minecraft_user', MinecraftUser);
 
 var MinecraftServer = new Schema({
