@@ -8,9 +8,14 @@ module.exports = function(app) {
 
     app.post('/mc/player/death', verifyServer, function(req, res) {
         if(req.body.map) { //rare cases when the map wasn't loaded.
+            killerId = null;
+            if(req.body.killer) {
+                killerId = mongoose.Types.ObjectId(req.body.killer);
+            }
+
             var death = new MinecraftDeath({
                 player: mongoose.Types.ObjectId(req.body.player),
-                killer: mongoose.Types.ObjectId(req.body.killer),
+                killer: killerId,
 
                 playerItem: req.body.playerItem,
                 killerItem: req.body.killerItem,
