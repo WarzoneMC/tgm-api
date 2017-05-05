@@ -6,6 +6,20 @@ var verifyServer = require('./verifyServer');
 
 module.exports = function(app) {
 
+    app.get('/:name', function(req, res, next) {
+        MinecraftUser.findOne({nameLower: req.params.name.toLowerCase()}, function(err, user) {
+            if(err) {
+                console.log(err);
+                res.json({error: true});
+            }
+            if(user) {
+                res.json(user);
+            } else {
+                res.json({notFound: true});
+            }
+        });
+    });
+
     app.post('/mc/player/death', verifyServer, function(req, res) {
         if(req.body.map) { //rare cases when the map wasn't loaded.
             killerId = null;
