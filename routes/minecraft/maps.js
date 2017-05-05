@@ -19,7 +19,7 @@ module.exports = function(app) {
                     teams: req.body.teams
                 }}, function(err) {
                     if(err) console.log(err);
-                    res.json({});
+                    res.json({map: map._id});
                 })
             } else {
                 map = new MinecraftMap({
@@ -32,7 +32,7 @@ module.exports = function(app) {
                 });
                 map.save(function(err) {
                     if(err) console.log(err);
-                    res.json({inserted: true});
+                    res.json({inserted: true, map: map._id});
                 })
             }
         })
