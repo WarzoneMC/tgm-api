@@ -54,7 +54,9 @@ var MinecraftMap = new Schema({
     nameLower       : String,
     version         : String,
     authors         : [String],
+    gametype        : String,
     thumbnail       : String,
-    images          : [String]
+    images          : [String],
+    teams           : [{ id: String, name: String, color: String, min: Number, max: Number }]
 });
 mongoose.model('minecraft_map', MinecraftMap);

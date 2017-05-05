@@ -1,12 +1,36 @@
 var mongoose = require("mongoose");
 var User = mongoose.model('user');
-var MinecraftServer = mongoose.model('minecraft_server');
 var MinecraftUser = mongoose.model('minecraft_user');
+var MinecraftKill = mongoose.model('minecraft_kill');
 var verifyServer = require('./verifyServer');
 
 module.exports = function(app) {
 
-    app.post('/mc/player/kill')
+    app.post('/mc/player/kill', verifyServer, function(req, res) {
+        if(req.body.map) { //rare cases when the map wasn't loaded.
+            var kill = new MinecraftKill({
+                player: mongoose.Types.ObjectId(req.body.player),
+                target: mongoose.Types.ObjectId(req.body.target),
+
+                playerItem: req.body.playerItem,
+                targetItem: req.body.targetItem,
+
+                map: mongoose.Types.ObjectId(req.body.map)
+            });
+            kill.save(function(err) {
+                if(err) console.log(err);
+
+                MinecraftUser.update({_id: kill.player}, {$inc: {kills: 1}}, function(err2) {
+                    if(err2) console.log(err2);
+
+                    MinecraftUser.update({_id: kill.target}, {$inc: {deaths: 1}}, function(err3) {
+                        if(err3) console.log(err3);
+                        res.json({});
+                    });
+                });
+            });
+        }
+    });
 
     app.post('/mc/player/login', verifyServer, function(req, res) {
         console.log('login request');

@@ -19,6 +19,7 @@ app.use(logger('dev'));
 /** load routes*/
 require('./routes/minecraft/users')(app);
 require('./routes/minecraft/servers')(app);
+require('./routes/minecraft/maps')(app);
 
 const port = config.port;
 
