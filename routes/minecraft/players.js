@@ -1,8 +1,10 @@
 var mongoose = require("mongoose");
-var User = mongoose.model('user');
+var verifyServer = require('./verifyServer');
+var async = require('async');
+
 var MinecraftUser = mongoose.model('minecraft_user');
 var MinecraftDeath = mongoose.model('minecraft_death');
-var verifyServer = require('./verifyServer');
+var MinecraftMatch = mongoose.model('minecraft_match');
 
 module.exports = function(app) {
 
@@ -13,19 +15,50 @@ module.exports = function(app) {
                 res.json({error: true});
             }
             if(user) {
-                MinecraftDeath
-                    .find({$or: [{player: user._id}, {killer: user._id}]})
-                    .sort('-date')
-                    .limit(20)
-                    .exec(function(err, deaths) {
-                        if(err) {
-                            console.log(err);
+
+                var deaths = new Array();
+                var matches = new Array();
+
+                async.series([
+                    function(callback) {
+                        if(req.body.deaths) {
+                            MinecraftDeath
+                                .find({$or: [{player: user._id}, {killer: user._id}]})
+                                .sort('-date')
+                                .limit(20)
+                                .exec(function(err, foundDeaths) {
+                                    if(err) {
+                                        console.log(err);
+                                    }
+                                    deaths = foundDeaths;
+                                    callback();
+                                })
+                        } else {
+                            callback();
                         }
-                        res.json({
-                            user: user,
-                            deaths: deaths
-                        });
-                    })
+                    },
+                    function(callback) {
+                        if (req.body.matches) {
+                            MinecraftMatch
+                                .find({matches: {$in: user.matches}})
+                                .sort('-finishedDate')
+                                .limit(10)
+                                .exec(function(err, foundMatches) {
+                                    if(err) console.log(err);
+                                    matches = foundMatches;
+                                    callback();
+                                })
+                        } else {
+                            callback();
+                        }
+                    }
+                ], function(err) {
+                    res.json({
+                        user: user,
+                        deaths: deaths,
+                        matches: matches
+                    });
+                })
             } else {
                 res.json({notFound: true});
             }
