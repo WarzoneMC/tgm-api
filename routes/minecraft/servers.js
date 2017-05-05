@@ -52,7 +52,7 @@ module.exports = function(app) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'token': config.minehut.auth
+                'x-access-token': config.minehut.auth
             },
             json: {
                 id: req.body.id,
