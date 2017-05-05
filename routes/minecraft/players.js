@@ -85,10 +85,9 @@ module.exports = function(app) {
     });
 
     var matchPlayerWithId = function(players, id) {
-        var found = null;
         async.eachSeries(players, function(player, next) {
             if(player._id == id) {
-                return found;
+                return player;
             } else {
                 next();
             }
