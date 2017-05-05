@@ -1,3 +1,5 @@
+var request = require('request');
+
 var mongoose = require("mongoose");
 var User = mongoose.model('user');
 var MinecraftUser = mongoose.model('minecraft_user');
@@ -6,38 +8,6 @@ var MinecraftMap = mongoose.model('minecraft_map');
 var verifyServer = require('./verifyServer');
 
 module.exports = function(app) {
-    app.post('/mc/server/loadmap', verifyServer, function(req, res) {
-        MinecraftMap.findOne({nameLower: req.body.name.toLowerCase()}, function(err, map) {
-            console.log('map body: ' + JSON.stringify(req.body, null, 2));
-
-            if(map) {
-                MinecraftMap.updateOne({nameLower: req.body.name.toLowerCase()}, {$set: {
-                    version: req.body.version,
-                    authors: req.body.authors,
-                    name: req.body.name,
-                    gametype: req.body.gametype,
-                    teams: req.body.teams
-                }}, function(err) {
-                    if(err) console.log(err);
-                    res.json({});
-                })
-            } else {
-                map = new MinecraftMap({
-                    name: req.body.name,
-                    nameLower: req.body.name.toLowerCase(),
-                    version: req.body.version,
-                    authors: req.body.authors,
-                    gametype: req.body.gametype,
-                    teams: req.body.teams
-                });
-                map.save(function(err) {
-                    if(err) console.log(err);
-                    res.json({inserted: true});
-                })
-            }
-        })
-    });
-
     app.post('/mc/server/heartbeat', verifyServer, function(req, res) {
         MinecraftServer.findOne({
             name: req.body.name
@@ -75,6 +45,24 @@ module.exports = function(app) {
                     res.json({});
                 })
             }
+        });
+
+        var options = {
+            url: config.minehut.url + "/server/core/heartbeat",
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'token': config.minehut.auth
+            },
+            json: {
+                id: req.body.id,
+                name: req.body.name,
+                updated: new Date(),
+                playerCount: req.body.playerCount + req.body.spectatorCount
+            }
+        };
+        request(options, function(err, res, body) {
+            if(err) console.log(err);
         });
     });
 
