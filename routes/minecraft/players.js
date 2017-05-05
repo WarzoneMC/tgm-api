@@ -90,7 +90,7 @@ module.exports = function(app) {
                 console.log('found player [' + player.name + ']')
                 return player;
             } else {
-                console.log('id did not match [' + player.name + ']');
+                console.log('id did not match [' + player.id + '!= ' + id  +']');
                 next();
             }
         }, function(err) {
