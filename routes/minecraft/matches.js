@@ -152,6 +152,9 @@ module.exports = function(app) {
                             teams.push({
                                 id: team.id,
                                 name: team.name,
+                                color: team.color,
+                                min: team.min,
+                                max: team.max,
                                 members: new Array()
                             })
                             next();
