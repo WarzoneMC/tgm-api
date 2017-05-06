@@ -27,7 +27,7 @@ module.exports = function(app) {
 
                     //load map
                     function(callback) {
-                        MinecraftMap.find({_id: mongoose.Types.ObjectId(match.map)}, function(err, map) {
+                        MinecraftMap.find({_id: match.map}, function(err, map) {
                             mapLoaded = map;
                             callback();
                         })
