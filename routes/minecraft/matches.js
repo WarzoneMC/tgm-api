@@ -6,6 +6,7 @@ var User = mongoose.model('user');
 var MinecraftUser = mongoose.model('minecraft_user');
 var MinecraftDeath = mongoose.model('minecraft_death');
 var MinecraftMatch = mongoose.model('minecraft_match');
+var MinecraftMap = mongoose.model('minecraft_map');
 
 module.exports = function(app) {
 
@@ -16,11 +17,21 @@ module.exports = function(app) {
                 var combinedIds = new Array();
                 var usersCombined = new Array();
 
+                var mapLoaded;
                 var deathsLoaded = new Array();
                 var winnersLoaded = new Array();
                 var losersLoaded = new Array();
                 var playerStats = new Array();
+                var teamsLoaded = new Array();
                 async.series([
+
+                    //load map
+                    function(callback) {
+                        MinecraftMap.find({_id: mongoose.Types.ObjectId(match.map)}, function(err, map) {
+                            mapLoaded = map;
+                            callback();
+                        })
+                    },
 
                     //group winner and loser player objects so we only query once.
                     function(callback) {
@@ -126,6 +137,39 @@ module.exports = function(app) {
                                 })
                             })
                         })
+                    },
+
+                    //group players into their teams
+                    function(callback) {
+                        var teams = new Array();
+                        async.eachSeries(mapLoaded.teams, function(team, next) {
+                            teams.push({
+                                id: team.id,
+                                name: team.name,
+                                members: new Array()
+                            })
+                            next();
+                        }, function(err) {
+                            async.eachSeries(match.teamMappings, function(teamMap, next) {
+
+                                async.eachSeries(teams, function(team, next) {
+                                    if(team.id == teamMap.team) {
+                                        //get the loaded player
+                                        Common.matchPlayerWithId(playerStats, teamMap.player, function(statPlayer) {
+                                            team.members.push(statPlayer);
+                                            next();
+                                        })
+                                    } else {
+                                        next();
+                                    }
+                                }, function(err) {
+                                    next();
+                                })
+                            }, function(err) {
+                                teamsLoaded = teams;
+                                callback();
+                            })
+                        })
                     }
                 ], function(err) {
                     res.json({
@@ -133,7 +177,9 @@ module.exports = function(app) {
                         winnersLoaded: winnersLoaded,
                         losersLoaded: losersLoaded,
                         playerStats: playerStats,
-                        deathsLoaded: deathsLoaded
+                        deathsLoaded: deathsLoaded,
+                        mapLoaded: mapLoaded,
+                        teamsLoaded: teamsLoaded
                     })
                 })
             } else {
@@ -171,7 +217,8 @@ module.exports = function(app) {
                             chat: req.body.chat,
                             deaths: fixedDeaths,
                             winners: fixedWinners,
-                            losers: fixedLosers
+                            losers: fixedLosers,
+                            teamMappings: req.body.teamMappings
                         });
                         match.save(function(err) {
                             if(err) {
