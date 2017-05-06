@@ -135,7 +135,9 @@ module.exports = function(app) {
                                 recentMatches.push({
                                     match: match,
                                     loadedMap: map,
-                                    timeElapsed: Common.toMMSS((match.finishedDate - match.startedDate) / 1000)
+                                    timeElapsed: Common.toMMSS((match.finishedDate - match.startedDate) / 1000),
+                                    team1Size: match.winners.length,
+                                    team2Size: match.losers.length
                                 });
 
                                 callback();
