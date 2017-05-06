@@ -25,7 +25,7 @@ module.exports = function(app) {
                             MinecraftDeath
                                 .find({$or: [{player: user._id}, {killer: user._id}]})
                                 .sort('-date')
-                                .limit(20)
+                                .limit(10)
                                 .exec(function(err, foundDeaths) {
                                     if(err) {
                                         console.log(err);
