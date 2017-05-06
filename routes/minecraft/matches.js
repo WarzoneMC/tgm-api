@@ -88,6 +88,37 @@ module.exports = function(app) {
         });
     });
 
+    app.get('/mc/match/recent/:playerName', function(req, res, next) {
+        MinecraftUser.findOne({nameLower: req.params.playerName.toLowerCase()}, function(err, user) {
+            MinecraftMatch
+                .find({_id: {$in: user.matches}})
+                .limit(5)
+                .sort("-finishedDate")
+                .exec(function(err, matches) {
+                    var loadedMap = {};
+
+                    async.eachSeries(matches, function(match, next) {
+                        async.series([
+                            //load map
+                            function(callback) {
+                                MinecraftMap.find({_id: match.map}, function(err, map) {
+                                    loadedMap = map;
+                                    callback();
+                                })
+                            }
+                        ], function(err) {
+                            next();
+                        })
+                    }, function(err) {
+                        res.json({
+                            match: match,
+                            loadedMap: loadedMap
+                        })
+                    })
+                })
+        })
+    })
+
     app.get('/mc/match/:id', function(req, res, next) {
         MinecraftMatch.findOne({_id: mongoose.Types.ObjectId(req.params.id)}, function(err, match) {
 
