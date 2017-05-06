@@ -184,6 +184,7 @@ module.exports = function(app) {
                     }
                 ], function(err) {
                     res.json({
+                        match: match,
                         playersLoaded: usersCombined,
                         winnersLoaded: winnersLoaded,
                         losersLoaded: losersLoaded,
