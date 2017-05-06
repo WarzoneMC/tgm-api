@@ -10,6 +10,72 @@ var MinecraftMap = mongoose.model('minecraft_map');
 
 module.exports = function(app) {
 
+    /**
+     * body: MatchLoadRequest.java
+     */
+    app.post('/mc/match/load', verifyServer, function(req, res) {
+       var match = new MinecraftMatch({
+           initializedDate: new Date().getTime(),
+           finished: false
+       });
+       match.save(function(err) {
+           res.json(match);
+       });
+    });
+
+    /**
+     * body: MatchInProgress.java
+     */
+    app.post('/mc/match/finish', verifyServer, function(req, res) {
+        console.log('match body: ' + JSON.stringify(req.body, null, 2));
+
+        async.eachSeries(req.body.chat, function(chat, next) {
+            chat.user = mongoose.Types.ObjectId(chat.user);
+            next();
+        }, function(err) {
+            var fixedDeaths = new Array();
+            async.eachSeries(req.body.deaths, function(death, next) {
+                fixedDeaths.push(mongoose.Types.ObjectId(death));
+                next();
+            }, function(err) {
+                var fixedWinners = new Array();
+                async.eachSeries(req.body.winners, function(winner, next) {
+                    fixedWinners.push(mongoose.Types.ObjectId(winner));
+                    next();
+                }, function(err) {
+                    var fixedLosers = new Array();
+                    async.eachSeries(req.body.losers, function(loser, next) {
+                        fixedLosers.push(mongoose.Types.ObjectId(loser));
+                        next();
+                    }, function(err) {
+                        MinecraftMatch.update({_id: mongoose.Types.ObjectId(req.body._id)}, {$set: {
+                            map: mongoose.Types.ObjectId(req.body.map),
+                            startedDate: req.body.startedDate,
+                            finishedDate: req.body.finishedDate,
+                            chat: req.body.chat,
+                            deaths: fixedDeaths,
+                            winners: fixedWinners,
+                            losers: fixedLosers,
+                            teamMappings: req.body.teamMappings
+                        }}, function(err) {
+                            if(err) {
+                                console.log(err);
+                            }
+                            res.json({matchId: match._id})
+                        });
+
+                        MinecraftUser.update({_id: {$in: fixedWinners}}, {$inc: {wins: 1}}, function(err) {
+                            if(err) console.log(err);
+                            MinecraftUser.update({_id: {$in: fixedLosers}}, {$inc: {losses: 1}}, function(err) {
+                                if(err) console.log(err);
+                            })
+                        })
+                    })
+                })
+            })
+        });
+    });
+
     app.get('/mc/match/:id', function(req, res, next) {
         MinecraftMatch.findOne({_id: mongoose.Types.ObjectId(req.params.id)}, function(err, match) {
 
@@ -91,6 +157,7 @@ module.exports = function(app) {
                     //Load deaths for the match and calculate each player's stats (kdr)
                     function(callback) {
                         MinecraftDeath.find({_id: {$in: match.deaths}}, function(err, deaths) {
+                            if(err) console.log(err);
 
                             async.eachSeries(deaths, function(death, next) {
 
@@ -200,57 +267,6 @@ module.exports = function(app) {
             } else {
                 res.json({notFound: true})
             }
-        });
-    });
-
-    app.post('/mc/match/new', verifyServer, function(req, res) {
-        console.log('match body: ' + JSON.stringify(req.body, null, 2));
-
-        async.eachSeries(req.body.chat, function(chat, next) {
-            chat.user = mongoose.Types.ObjectId(chat.user);
-            next();
-        }, function(err) {
-            var fixedDeaths = new Array();
-            async.eachSeries(req.body.deaths, function(death, next) {
-                fixedDeaths.push(mongoose.Types.ObjectId(death));
-                next();
-            }, function(err) {
-                var fixedWinners = new Array();
-                async.eachSeries(req.body.winners, function(winner, next) {
-                    fixedWinners.push(mongoose.Types.ObjectId(winner));
-                    next();
-                }, function(err) {
-                    var fixedLosers = new Array();
-                    async.eachSeries(req.body.losers, function(loser, next) {
-                        fixedLosers.push(mongoose.Types.ObjectId(loser));
-                        next();
-                    }, function(err) {
-                        var match = new MinecraftMatch({
-                            map: mongoose.Types.ObjectId(req.body.map),
-                            startedDate: req.body.startedDate,
-                            finishedDate: req.body.finishedDate,
-                            chat: req.body.chat,
-                            deaths: fixedDeaths,
-                            winners: fixedWinners,
-                            losers: fixedLosers,
-                            teamMappings: req.body.teamMappings
-                        });
-                        match.save(function(err) {
-                            if(err) {
-                                console.log(err);
-                            }
-                           res.json({matchId: match._id})
-                        });
-
-                        MinecraftUser.update({_id: {$in: fixedWinners}}, {$inc: {wins: 1}}, function(err) {
-                            if(err) console.log(err);
-                            MinecraftUser.update({_id: {$in: fixedLosers}}, {$inc: {losses: 1}}, function(err) {
-                                if(err) console.log(err);
-                            })
-                        })
-                    })
-                })
-            })
         });
     });
 

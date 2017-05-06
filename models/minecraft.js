@@ -52,8 +52,8 @@ var MinecraftDeath = new Schema({
     killerItem      : String,
 
     map             : ObjectId,
-
-    date            : Date,
+    date            : Number,
+    match           : ObjectId,
 
     playerLoaded    : MinecraftUser,
     killerLoaded    : MinecraftUser
@@ -80,8 +80,9 @@ mongoose.model('minecraft_map', MinecraftMap);
 
 var MinecraftMatch = new Schema({
     map             : ObjectId,
-    startedDate     : Date,
-    finishedDate    : Date,
+    initializedDate : Number,
+    startedDate     : Number,
+    finishedDate    : Number,
     chat            : [{
         user: ObjectId,
         username: String,
@@ -98,6 +99,7 @@ var MinecraftMatch = new Schema({
     teamMappings: [{
         team: String,
         player: ObjectId
-    }]
+    }],
+    finished: Boolean
 });
 mongoose.model('minecraft_match', MinecraftMatch);
