@@ -136,8 +136,7 @@ module.exports = function(app) {
                                     match: match,
                                     loadedMap: map,
                                     timeElapsed: Common.toMMSS((match.finishedDate - match.startedDate) / 1000),
-                                    team1Size: match.winners.length,
-                                    team2Size: match.losers.length
+                                    matchSize: match.winners.length + match.losers.length
                                 });
 
                                 callback();
