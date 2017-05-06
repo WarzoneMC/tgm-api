@@ -99,9 +99,6 @@ module.exports = function(app) {
 
                                     Common.matchPlayerWithId(usersCombined, death.killer, function(found) {
                                         death.killerLoaded = found;
-
-                                        deathsLoaded.push(death);
-
                                         next();
                                     })
                                 });
@@ -134,7 +131,13 @@ module.exports = function(app) {
 
                                     }, function(err) {
                                         playerStats.push(playerStat);
-                                        next();
+
+                                        async.eachSeries(deaths, function(death, next) {
+                                            deathsLoaded.push(death);
+                                            next();
+                                        }, function(err) {
+                                            next();
+                                        })
                                     })
                                 }, function(err) {
                                     callback();
