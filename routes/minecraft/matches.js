@@ -52,7 +52,8 @@ module.exports = function(app) {
                         fixedLosers.push(mongoose.Types.ObjectId(loser));
                         next();
                     }, function(err) {
-                        MinecraftMatch.update({_id: mongoose.Types.ObjectId(req.body.id)}, {$set: {
+                        //we have to use _id since the MatchInProgress.java serialized name is _id
+                        MinecraftMatch.update({_id: mongoose.Types.ObjectId(req.body._id)}, {$set: {
                             map: mongoose.Types.ObjectId(req.body.map),
                             startedDate: req.body.startedDate,
                             finishedDate: req.body.finishedDate,
