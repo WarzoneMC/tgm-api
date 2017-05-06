@@ -108,6 +108,46 @@ module.exports = function(app) {
         })
     }
 
+    app.get('/mc/player/deaths', function(req, res) {
+        MinecraftDeath
+            .find({})
+            .sort('-date')
+            .limit(4)
+            .exec(function(err, foundDeaths) {
+                if(err) {
+                    console.log(err);
+                }
+                var containing = new Array();
+                async.eachSeries(foundDeaths, function(death, next) {
+                    containing.push(death.player);
+                    if(death.killer) {
+                        containing.push(death.killer);
+                    }
+                    next();
+                }, function(err) {
+                    MinecraftUser.find({_id: {$in: containing}}, function(err, players) {
+                        if(err) console.log(err);
+
+                        async.eachSeries(foundDeaths, function(death, next) {
+
+                            matchPlayerWithId(players, death.player, function(found) {
+                                death.playerLoaded = found;
+
+                                matchPlayerWithId(players, death.killer, function(found) {
+                                    death.killerLoaded = found;
+
+                                    console.log('loaded player: ' + death.playerLoaded.name);
+                                    next();
+                                })
+                            });
+                        }, function(err) {
+                            res.json(deaths);
+                        })
+                    })
+                })
+            })
+    })
+
     app.post('/mc/player/death', verifyServer, function(req, res) {
         if(req.body.map) { //rare cases when the map wasn't loaded.
             killerId = null;
