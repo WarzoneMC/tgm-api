@@ -70,7 +70,7 @@ module.exports = function(app) {
     app.post('/mc/death/new', verifyServer, function(req, res) {
         console.log('death body: ' + JSON.stringify(req.body, null, 2));
 
-        if(req.body.map) { //rare cases when the map wasn't loaded.
+        if(req.body.mapId) { //rare cases when the map wasn't loaded.
             killerId = null;
             if(req.body.killer) {
                 killerId = mongoose.Types.ObjectId(req.body.killer);
@@ -83,7 +83,7 @@ module.exports = function(app) {
                 playerItem: req.body.playerItem,
                 killerItem: req.body.killerItem,
 
-                map: mongoose.Types.ObjectId(req.body.map),
+                map: mongoose.Types.ObjectId(req.body.mapId),
                 date: new Date().getTime(),
                 match: mongoose.Types.ObjectId(req.body.match)
             });
