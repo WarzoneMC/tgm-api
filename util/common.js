@@ -71,3 +71,19 @@ function mail(from, email, subject, mailbody){
         smtpTransport.close(); // shut down the connection pool, no more messages
     });
 }
+
+exports.matchPlayerWithId = function(players, id, callback) {
+    if(id == null) {
+        return callback(null);
+    }
+    async.eachSeries(players, function(player, next) {
+        if(player._id.toString() == id.toString()) {
+            console.log('found player [' + player.name + ']')
+            callback(player);
+        } else {
+            next();
+        }
+    }, function(err) {
+        callback(null);
+    })
+}

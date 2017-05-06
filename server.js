@@ -3,7 +3,7 @@ config = require('./config.json');
 const bodyParser = require('body-parser');
 var logger = require('morgan');
 const app = express();
-const Common = require('./util/common');
+Common = require('./util/common');
 
 var mongoose = require('mongoose');
 mongoose.connect(config.mongo);
@@ -28,6 +28,7 @@ require('./routes/minecraft/servers')(app);
 require('./routes/minecraft/maps')(app);
 require('./routes/minecraft/leaderboards')(app);
 require('./routes/minecraft/matches')(app);
+require('./routes/minecraft/deaths')(app);
 
 const port = config.port;
 

@@ -43,10 +43,10 @@ module.exports = function(app) {
 
                                             async.eachSeries(foundDeaths, function(death, next) {
 
-                                                matchPlayerWithId(players, death.player, function(found) {
+                                                Common.matchPlayerWithId(players, death.player, function(found) {
                                                     death.playerLoaded = found;
 
-                                                    matchPlayerWithId(players, death.killer, function(found) {
+                                                    Common.matchPlayerWithId(players, death.killer, function(found) {
                                                         death.killerLoaded = found;
 
                                                         console.log('loaded player: ' + death.playerLoaded.name);
@@ -91,22 +91,6 @@ module.exports = function(app) {
             }
         });
     });
-
-    var matchPlayerWithId = function(players, id, callback) {
-        if(id == null) {
-            return callback(null);
-        }
-        async.eachSeries(players, function(player, next) {
-            if(player._id.toString() == id.toString()) {
-                console.log('found player [' + player.name + ']')
-                callback(player);
-            } else {
-                next();
-            }
-        }, function(err) {
-            callback(null);
-        })
-    }
 
     app.get('/mc/player/deaths', function(req, res) {
         MinecraftDeath
