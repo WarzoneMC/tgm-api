@@ -101,6 +101,7 @@ module.exports = function(app) {
                 var losersLoaded = new Array();
                 var playerStats = new Array();
                 var teamsLoaded = new Array();
+                var miscData = {};
                 async.series([
 
                     //load map
@@ -270,6 +271,9 @@ module.exports = function(app) {
                         })
                     }
                 ], function(err) {
+                    miscData = {
+                        timeElapsed: match.finishedDate - match.startedDate
+                    };
                     res.json({
                         match: match,
                         playersLoaded: usersCombined,
@@ -278,7 +282,8 @@ module.exports = function(app) {
                         playerStats: playerStats,
                         deathsLoaded: deathsLoaded,
                         mapLoaded: mapLoaded,
-                        teamsLoaded: teamsLoaded
+                        teamsLoaded: teamsLoaded,
+                        miscData: miscData
                     })
                 })
             } else {
