@@ -88,7 +88,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/mc/match/recent/:playerName', function(req, res, next) {
+    app.get('/mc/match/latest/:playerName', function(req, res, next) {
         MinecraftUser.findOne({nameLower: req.params.playerName.toLowerCase()}, function(err, user) {
             MinecraftMatch
                 .find({_id: {$in: user.matches}})
@@ -119,7 +119,7 @@ module.exports = function(app) {
         })
     });
 
-    app.get('/mc/match/recent', function(req, res, next) {
+    app.get('/mc/match/latest', function(req, res, next) {
         MinecraftMatch
             .find({})
             .limit(4)
