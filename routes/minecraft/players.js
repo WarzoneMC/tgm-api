@@ -39,6 +39,8 @@ module.exports = function(app) {
                                         next();
                                     }, function(err) {
                                         MinecraftUser.find({_id: {$in: containing}}, function(err, players) {
+                                            if(err) console.log(err);
+
                                             async.eachSeries(foundDeaths, function(death, next) {
                                                 death.playerLoaded = matchPlayerWithId(players, death.player);
                                                 if(death.killer) {
