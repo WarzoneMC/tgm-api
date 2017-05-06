@@ -117,7 +117,36 @@ module.exports = function(app) {
                     })
                 })
         })
-    })
+    });
+
+    app.get('/mc/match/recent', function(req, res, next) {
+        MinecraftMatch
+            .find({})
+            .limit(4)
+            .sort("-finishedDate")
+            .exec(function(err, matches) {
+                var recentMatches = new Array();
+                async.eachSeries(matches, function(match, next) {
+                    async.series([
+                        //load map
+                        function(callback) {
+                            MinecraftMap.findOne({_id: match.map}, function(err, map) {
+                                recentMatches.push({
+                                    match: match,
+                                    loadedMap: map
+                                });
+
+                                callback();
+                            })
+                        }
+                    ], function(err) {
+                        next();
+                    })
+                }, function(err) {
+                    res.json(recentMatches);
+                })
+            })
+    });
 
     app.get('/mc/match/:id', function(req, res, next) {
         MinecraftMatch.findOne({_id: mongoose.Types.ObjectId(req.params.id)}, function(err, match) {
