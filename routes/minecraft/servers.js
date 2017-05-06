@@ -59,6 +59,7 @@ module.exports = function(app) {
                 name: req.body.name,
                 updated: new Date(),
                 playerCount: req.body.playerCount + req.body.spectatorCount,
+                maxPlayers: req.body.maxPlayers,
                 type: 'teamgg'
             }
         };
