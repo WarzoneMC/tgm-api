@@ -28,6 +28,8 @@ module.exports = function(app) {
                     //load map
                     function(callback) {
                         MinecraftMap.find({_id: match.map}, function(err, map) {
+                            if(err) console.log(err);
+
                             mapLoaded = map;
                             callback();
                         })
@@ -143,7 +145,9 @@ module.exports = function(app) {
                     //group players into their teams
                     function(callback) {
                         var teams = new Array();
+                        console.log('sorting teams...');
                         async.eachSeries(mapLoaded.teams, function(team, next) {
+                            console.log('map team: ' + team.id);
                             teams.push({
                                 id: team.id,
                                 name: team.name,
