@@ -24,7 +24,7 @@ module.exports = function(app) {
         })
     }
 
-    app.get('/mc/deaths/latest', function(req, res) {
+    app.get('/mc/death/latest', function(req, res) {
         MinecraftDeath
             .find({})
             .sort('-date')
@@ -64,7 +64,7 @@ module.exports = function(app) {
             })
     })
 
-    app.post('/mc/deaths/new', verifyServer, function(req, res) {
+    app.post('/mc/death/new', verifyServer, function(req, res) {
         if(req.body.map) { //rare cases when the map wasn't loaded.
             killerId = null;
             if(req.body.killer) {
