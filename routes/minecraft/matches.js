@@ -17,7 +17,7 @@ module.exports = function(app) {
                 var combinedIds = new Array();
                 var usersCombined = new Array();
 
-                var mapLoaded;
+                var mapLoaded = {};
                 var deathsLoaded = new Array();
                 var winnersLoaded = new Array();
                 var losersLoaded = new Array();
@@ -31,6 +31,7 @@ module.exports = function(app) {
                             if(err) console.log(err);
 
                             mapLoaded = map;
+                            console.log('map name: ' + map.name);
                             callback();
                         })
                     },
