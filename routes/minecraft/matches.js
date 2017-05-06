@@ -23,16 +23,16 @@ module.exports = function(app) {
 
                 //group winner and loser player objects so we only query once.
                 function(callback) {
-                    async.eachSeries(match.winners, function(next) {
-                        combinedIds.push(match.winners);
+                    async.eachSeries(match.winners, function(winner, next) {
+                        combinedIds.push(winner);
                         next();
                     }, function(err) {
                         callback();
                     })
                 },
                 function(callback) {
-                    async.eachSeries(match.losers, function(next) {
-                        combinedIds.push(match.losers);
+                    async.eachSeries(match.losers, function(loser, next) {
+                        combinedIds.push(loser);
                         next();
                     }, function(err) {
                         callback();
