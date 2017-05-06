@@ -61,7 +61,7 @@ module.exports = function(app) {
                             winners: fixedWinners,
                             losers: fixedLosers,
                             teamMappings: req.body.teamMappings,
-                            winingTeam: req.body.winningTeam
+                            winningTeam: req.body.winningTeam
                         }}, function(err) {
                             if(err) {
                                 console.log(err);
