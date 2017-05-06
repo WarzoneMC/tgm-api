@@ -72,12 +72,13 @@ module.exports = function(app) {
                             res.json({})
                         });
 
-                        MinecraftUser.update({_id: {$in: fixedWinners}}, {$inc: {wins: 1}}, function(err) {
+                        MinecraftUser.update({_id: {$in: fixedWinners}}, {$inc: {wins: 1}}, {multi: true}, function(err) {
                             if(err) console.log(err);
-                            MinecraftUser.update({_id: {$in: fixedLosers}}, {$inc: {losses: 1}}, function(err) {
+                            MinecraftUser.update({_id: {$in: fixedLosers}}, {$inc: {losses: 1}}, {multi: true}, function(err) {
                                 if(err) console.log(err);
+
                                 MinecraftUser.update({_id: {$in: allUserIds}},
-                                    {$addToSet: {matches: mongoose.Types.ObjectId(req.body.id)}}, function(err) {
+                                    {$addToSet: {matches: mongoose.Types.ObjectId(req.body.id)}}, {multi: true}, function(err) {
                                     if(err) console.log(err);
                                 })
                             })
