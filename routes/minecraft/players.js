@@ -93,7 +93,7 @@ module.exports = function(app) {
     });
 
     var matchPlayerWithId = function(players, id, callback) {
-        if(player == null) {
+        if(id == null) {
             return callback(null);
         }
         async.eachSeries(players, function(player, next) {
