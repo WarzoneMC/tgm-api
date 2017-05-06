@@ -95,14 +95,17 @@ module.exports = function(app) {
                 .limit(5)
                 .sort("-finishedDate")
                 .exec(function(err, matches) {
-                    var loadedMap = {};
-
+                    var recentMatches = new Array();
                     async.eachSeries(matches, function(match, next) {
                         async.series([
                             //load map
                             function(callback) {
                                 MinecraftMap.find({_id: match.map}, function(err, map) {
-                                    loadedMap = map;
+                                    recentMatches.push({
+                                        match: match,
+                                        loadedMap: map
+                                    });
+
                                     callback();
                                 })
                             }
@@ -110,10 +113,7 @@ module.exports = function(app) {
                             next();
                         })
                     }, function(err) {
-                        res.json({
-                            matches: matches,
-                            loadedMap: loadedMap
-                        })
+                        res.json(recentMatches);
                     })
                 })
         })
