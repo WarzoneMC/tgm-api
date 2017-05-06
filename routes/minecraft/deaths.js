@@ -64,6 +64,9 @@ module.exports = function(app) {
             })
     })
 
+    /**
+     * body: Death.java
+     */
     app.post('/mc/death/new', verifyServer, function(req, res) {
         if(req.body.map) { //rare cases when the map wasn't loaded.
             killerId = null;
@@ -80,7 +83,7 @@ module.exports = function(app) {
 
                 map: mongoose.Types.ObjectId(req.body.map),
                 date: new Date().getTime(),
-                match: mongoose.Types.ObjectId(req.body._id)
+                match: mongoose.Types.ObjectId(req.body.match)
             });
             death.save(function(err) {
                 if(err) console.log(err);
@@ -99,6 +102,9 @@ module.exports = function(app) {
 
                 res.json({});
             });
+        } else {
+            console.log('death did not contain map');
+            res.json({error: true})
         }
     });
 

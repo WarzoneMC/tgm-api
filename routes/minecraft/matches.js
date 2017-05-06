@@ -19,6 +19,7 @@ module.exports = function(app) {
            finished: false
        });
        match.save(function(err) {
+           if(err) console.log(err);
            res.json(match);
        });
     });
