@@ -108,6 +108,7 @@ module.exports = function(app) {
                                     var playerStat = {
                                         name: user.name,
                                         uuid: user.uuid,
+                                        _id: user._id,
                                         kills: 0,
                                         deaths: 0,
                                         kdr: 0
@@ -153,7 +154,8 @@ module.exports = function(app) {
                             async.eachSeries(match.teamMappings, function(teamMap, next) {
 
                                 async.eachSeries(teams, function(team, next) {
-                                    if(team.id == teamMap.team) {
+                                    console.log('comparing teams: ' + team.id + " | " + teamMap.team);
+                                    if(team.id.toString() == teamMap.team) {
                                         //get the loaded player
                                         Common.matchPlayerWithId(playerStats, teamMap.player, function(statPlayer) {
                                             team.members.push(statPlayer);
