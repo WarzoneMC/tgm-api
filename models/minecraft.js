@@ -85,6 +85,7 @@ var MinecraftMatch = new Schema({
     chat            : [{
         user: ObjectId,
         username: String,
+        uuid: String,
         message: String,
         team: String,
         matchTime: Number,
