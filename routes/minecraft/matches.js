@@ -60,7 +60,8 @@ module.exports = function(app) {
                             deaths: fixedDeaths,
                             winners: fixedWinners,
                             losers: fixedLosers,
-                            teamMappings: req.body.teamMappings
+                            teamMappings: req.body.teamMappings,
+                            winingTeam: req.body.winningTeam
                         }}, function(err) {
                             if(err) {
                                 console.log(err);
@@ -230,7 +231,10 @@ module.exports = function(app) {
                                 min: team.min,
                                 max: team.max,
                                 members: new Array(),
-                                winners: team.id == match.winningTeam
+                                won: team.id == match.winningTeam,
+
+                                kills: 0,
+                                deaths: 0
                             })
                             next();
                         }, function(err) {
@@ -242,6 +246,8 @@ module.exports = function(app) {
                                         //get the loaded player
                                         Common.matchPlayerWithId(playerStats, teamMap.player, function(statPlayer) {
                                             team.members.push(statPlayer);
+                                            team.kills += statPlayer.kills;
+                                            team.deaths += statPlayer.deaths;
                                             next();
                                         })
                                     } else {
