@@ -57,7 +57,7 @@ module.exports = function(app) {
                                 })
                             });
                         }, function(err) {
-                            res.json(deaths);
+                            res.json(foundDeaths);
                         })
                     })
                 })
