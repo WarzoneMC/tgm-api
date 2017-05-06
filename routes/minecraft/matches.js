@@ -20,6 +20,8 @@ module.exports = function(app) {
        });
        match.save(function(err) {
            if(err) console.log(err);
+
+           console.log('created new match: ' + match._id);
            res.json(match);
        });
     });
