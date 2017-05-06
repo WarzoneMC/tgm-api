@@ -96,6 +96,7 @@ module.exports = function(app) {
 
                                     var playerStat = {
                                         name: user.name,
+                                        uuid: user.uuid,
                                         kills: 0,
                                         deaths: 0,
                                         kdr: 0
