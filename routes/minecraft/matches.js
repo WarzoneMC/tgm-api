@@ -155,7 +155,8 @@ module.exports = function(app) {
                                 color: team.color,
                                 min: team.min,
                                 max: team.max,
-                                members: new Array()
+                                members: new Array(),
+                                winners: team.id == match.winningTeam
                             })
                             next();
                         }, function(err) {
