@@ -16,7 +16,8 @@ module.exports = function(app) {
     app.post('/mc/match/load', verifyServer, function(req, res) {
        var match = new MinecraftMatch({
            initializedDate: new Date().getTime(),
-           finished: false
+           finished: false,
+           map: mongoose.Types.ObjectId(req.body.map)
        });
        match.save(function(err) {
            if(err) console.log(err);
