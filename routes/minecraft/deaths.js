@@ -68,6 +68,8 @@ module.exports = function(app) {
      * body: Death.java
      */
     app.post('/mc/death/new', verifyServer, function(req, res) {
+        console.log('death body: ' + JSON.stringify(req.body, null, 2));
+
         if(req.body.map) { //rare cases when the map wasn't loaded.
             killerId = null;
             if(req.body.killer) {
