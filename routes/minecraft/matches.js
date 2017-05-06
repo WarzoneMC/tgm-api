@@ -160,7 +160,7 @@ module.exports = function(app) {
 
                     //Load deaths for the match and calculate each player's stats (kdr)
                     function(callback) {
-                        MinecraftDeath.find({_id: {$in: match.deaths}}, function(err, deaths) {
+                        MinecraftDeath.find({match: match._id}, function(err, deaths) {
                             if(err) console.log(err);
 
                             async.eachSeries(deaths, function(death, next) {
