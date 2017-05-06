@@ -111,7 +111,7 @@ module.exports = function(app) {
                         })
                     }, function(err) {
                         res.json({
-                            match: match,
+                            matches: matches,
                             loadedMap: loadedMap
                         })
                     })
