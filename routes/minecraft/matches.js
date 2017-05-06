@@ -27,7 +27,7 @@ module.exports = function(app) {
 
                     //load map
                     function(callback) {
-                        MinecraftMap.find({_id: match.map}, function(err, map) {
+                        MinecraftMap.findOne({_id: match.map}, function(err, map) {
                             if(err) console.log(err);
 
                             mapLoaded = map;
