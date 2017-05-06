@@ -246,6 +246,7 @@ module.exports = function(app) {
                                     })
                                 });
                             }, function(err) {
+                                var deathsCache = new Array();
                                 async.eachSeries(usersCombined, function(user, next) {
 
                                     var playerStat = {
@@ -274,15 +275,10 @@ module.exports = function(app) {
 
                                     }, function(err) {
                                         playerStats.push(playerStat);
-
-                                        async.eachSeries(deaths, function(death, next) {
-                                            deathsLoaded.push(death);
-                                            next();
-                                        }, function(err) {
-                                            next();
-                                        })
+                                        next();
                                     })
                                 }, function(err) {
+                                    deathsLoaded = deaths;
                                     callback();
                                 })
                             })
