@@ -42,12 +42,17 @@ module.exports = function(app) {
                                             if(err) console.log(err);
 
                                             async.eachSeries(foundDeaths, function(death, next) {
-                                                death.playerLoaded = matchPlayerWithId(players, death.player);
-                                                if(death.killer) {
-                                                    death.killerLoaded = matchPlayerWithId(players, death.killer);
-                                                }
-                                                console.log('loaded player: ' + death.playerLoaded.name);
-                                                next();
+
+                                                matchPlayerWithId(players, death.player, function(found) {
+                                                    death.playerLoaded = found;
+
+                                                    matchPlayerWithId(players, death.killer, function(found) {
+                                                        death.killerLoaded = found;
+
+                                                        console.log('loaded player: ' + death.playerLoaded.name);
+                                                        next();
+                                                    })
+                                                });
                                             }, function(err) {
                                                 deaths = foundDeaths;
                                                 callback();
@@ -87,16 +92,19 @@ module.exports = function(app) {
         });
     });
 
-    var matchPlayerWithId = function(players, id) {
+    var matchPlayerWithId = function(players, id, callback) {
+        if(player == null) {
+            return callback(null);
+        }
         async.eachSeries(players, function(player, next) {
             if(player._id.toString() == id.toString()) {
                 console.log('found player [' + player.name + ']')
-                return player;
+                callback(player);
             } else {
                 next();
             }
         }, function(err) {
-            return null;
+            callback(null);
         })
     }
 
