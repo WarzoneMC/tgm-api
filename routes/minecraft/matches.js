@@ -11,6 +11,130 @@ module.exports = function(app) {
 
     app.get('/mc/match/:id', function(req, res, next) {
         MinecraftMatch.findOne({_id: mongoose.Types.ObjectId(req.params.id)}, function(err, match) {
+
+            var combinedIds = new Array();
+            var usersCombined = new Array();
+
+            var deathsLoaded = new Array();
+            var winnersLoaded = new Array();
+            var losersLoaded = new Array();
+            var playerStats = new Array();
+            async.series([
+
+                //group winner and loser player objects so we only query once.
+                function(callback) {
+                    async.eachSeries(match.winners, function(next) {
+                        combinedIds.push(match.winners);
+                        next();
+                    }, function(err) {
+                        callback();
+                    })
+                },
+                function(callback) {
+                    async.eachSeries(match.losers, function(next) {
+                        combinedIds.push(match.losers);
+                        next();
+                    }, function(err) {
+                        callback();
+                    })
+                },
+
+                //load winner and loser player objects.
+                function(callback) {
+                    MinecraftUser.find({_id: {$in: combinedIds}}, function(err, users) {
+                        if(err) console.log(err);
+
+                        async.series([
+                            function(callback) {
+                                async.eachSeries(match.winners, function(winner, next) {
+                                    Common.matchPlayerWithId(users, winner, function(player) {
+                                        winnersLoaded.push(player);
+                                        usersCombined.push(player);
+                                        next();
+                                    })
+                                }, function(err) {
+                                    callback();
+                                })
+                            },
+                            function(callback) {
+                                async.eachSeries(match.losers, function(loser, next) {
+                                    Common.matchPlayerWithId(users, loser, function(player) {
+                                        losersLoaded.push(player);
+                                        usersCombined.push(player);
+                                        next();
+                                    })
+                                }, function(err) {
+                                    callback();
+                                })
+                            }
+                        ], function(err) {
+                            callback();
+                        })
+                    })
+                },
+
+                //Load deaths for the match and calculate each player's stats (kdr)
+                function(callback) {
+                    MinecraftDeath.find({_id: {$in: match.deaths}}, function(err, deaths) {
+
+                        async.eachSeries(deaths, function(death, next) {
+
+                            Common.matchPlayerWithId(usersCombined, death.player, function(found) {
+                                death.playerLoaded = found;
+
+                                Common.matchPlayerWithId(usersCombined, death.killer, function(found) {
+                                    death.killerLoaded = found;
+
+                                    deathsLoaded.push(death);
+
+                                    next();
+                                })
+                            });
+                        }, function(err) {
+                            async.eachSeries(usersCombined, function(user, next) {
+
+                                var playerStat = {
+                                    name: user.name,
+                                    kills: 0,
+                                    deaths: 0,
+                                    kdr: 0
+                                };
+
+                                async.eachSeries(deaths, function(death, next) {
+                                    if(death.player.toString() == user._id.toString()) {
+                                        playerStat.deaths = playerStat.deaths + 1;
+                                    }
+                                    else if (death.killer != null && death.killer.toString() == user._id.toString()) {
+                                        playerStat.kills = playerStat.kills + 1;
+                                    }
+
+                                    if(deaths == 0) {
+                                        playerStat.kdr = playerStat.kills / 1;
+                                    } else {
+                                        playerStat.kdr = playerStat.kills / playerStat.deaths
+                                    }
+                                    next();
+
+                                }, function(err) {
+                                    playerStats.push(playerStat);
+                                    next();
+                                })
+                            }, function(err) {
+                                callback();
+                            })
+                        })
+                    })
+                }
+            ], function(err) {
+                res.json({
+                    playersLoaded: usersCombined,
+                    winnersLoaded: winnersLoaded,
+                    losersLoaded: losersLoaded,
+                    playerStats: playerStats,
+                    deathsLoaded: deathsLoaded
+                })
+            })
+
             if(err) {
                 console.log(err);
                 res.json({error: true});
@@ -50,6 +174,7 @@ module.exports = function(app) {
                             startedDate: req.body.startedDate,
                             finishedDate: req.body.finishedDate,
                             chat: req.body.chat,
+                            deaths: fixedDeaths,
                             winners: fixedWinners,
                             losers: fixedLosers
                         });

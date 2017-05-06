@@ -83,6 +83,7 @@ var MinecraftMatch = new Schema({
         matchTime: Number,
         teamChat: Boolean
     }],
+    deaths: [ObjectId],
     winners: [ObjectId],
     losers: [ObjectId],
     winningTeam: String
