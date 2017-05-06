@@ -44,6 +44,7 @@ module.exports = function(app) {
                                                 if(death.killer) {
                                                     death.killerLoaded = matchPlayerWithId(players, death.killer);
                                                 }
+                                                console.log('loaded player: ' + death.playerLoaded.name);
                                                 next();
                                             }, function(err) {
                                                 deaths = foundDeaths;
