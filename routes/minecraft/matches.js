@@ -235,6 +235,8 @@ module.exports = function(app) {
                         MinecraftDeath.find({match: match._id}, function(err, deaths) {
                             if(err) console.log(err);
 
+                            console.log('found ' + deaths.length + ' deaths.');
+
                             async.eachSeries(deaths, function(death, next) {
 
                                 Common.matchPlayerWithId(usersCombined, death.player, function(found) {
@@ -267,9 +269,9 @@ module.exports = function(app) {
                                         }
 
                                         if(deaths == 0) {
-                                            playerStat.kdr = playerStat.kills / 1;
+                                            playerStat.kdr = (playerStat.kills / 1).toFixed(2);
                                         } else {
-                                            playerStat.kdr = playerStat.kills / playerStat.deaths
+                                            playerStat.kdr = (playerStat.kills / playerStat.deaths).toFixed(2)
                                         }
                                         next();
 
