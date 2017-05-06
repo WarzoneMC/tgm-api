@@ -33,6 +33,7 @@ module.exports = function(app) {
     app.post('/mc/match/finish', verifyServer, function(req, res) {
         console.log('match body: ' + JSON.stringify(req.body, null, 2));
 
+        var allUserIds = new Array();
         async.eachSeries(req.body.chat, function(chat, next) {
             chat.user = mongoose.Types.ObjectId(chat.user);
             next();
@@ -45,11 +46,13 @@ module.exports = function(app) {
                 var fixedWinners = new Array();
                 async.eachSeries(req.body.winners, function(winner, next) {
                     fixedWinners.push(mongoose.Types.ObjectId(winner));
+                    allUserIds.push(winner);
                     next();
                 }, function(err) {
                     var fixedLosers = new Array();
                     async.eachSeries(req.body.losers, function(loser, next) {
                         fixedLosers.push(mongoose.Types.ObjectId(loser));
+                        allUserIds.push(loser);
                         next();
                     }, function(err) {
                         MinecraftMatch.update({_id: mongoose.Types.ObjectId(req.body.id)}, {$set: {
@@ -73,6 +76,10 @@ module.exports = function(app) {
                             if(err) console.log(err);
                             MinecraftUser.update({_id: {$in: fixedLosers}}, {$inc: {losses: 1}}, function(err) {
                                 if(err) console.log(err);
+                                MinecraftUser.update({_id: {$in: allUserIds}},
+                                    {$addToSet: {matches: mongoose.Types.ObjectId(req.body.id)}}, function(err) {
+                                    if(err) console.log(err);
+                                })
                             })
                         })
                     })
