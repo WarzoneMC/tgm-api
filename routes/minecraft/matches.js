@@ -100,7 +100,7 @@ module.exports = function(app) {
                         async.series([
                             //load map
                             function(callback) {
-                                MinecraftMap.find({_id: match.map}, function(err, map) {
+                                MinecraftMap.findOne({_id: match.map}, function(err, map) {
                                     recentMatches.push({
                                         match: match,
                                         loadedMap: map
