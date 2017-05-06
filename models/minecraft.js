@@ -60,17 +60,6 @@ var MinecraftDeath = new Schema({
 });
 mongoose.model('minecraft_death', MinecraftDeath);
 
-var MinecraftMapTeam = new Schema({
-    id: String,
-    name: String,
-    color: String,
-    min: Number,
-    max: Number,
-    members: [ObjectId],
-
-    membersLoaded: [MinecraftUser]
-});
-
 var MinecraftMap = new Schema({
     name            : String,
     nameLower       : String,
@@ -79,7 +68,13 @@ var MinecraftMap = new Schema({
     gametype        : String,
     thumbnail       : String,
     images          : [String],
-    teams           : [MinecraftMapTeam]
+    teams           : [{
+        id: String,
+        name: String,
+        color: String,
+        min: Number,
+        max: Number,
+    }]
 });
 mongoose.model('minecraft_map', MinecraftMap);
 
