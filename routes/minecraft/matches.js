@@ -103,7 +103,8 @@ module.exports = function(app) {
                                 MinecraftMap.findOne({_id: match.map}, function(err, map) {
                                     recentMatches.push({
                                         match: match,
-                                        loadedMap: map
+                                        loadedMap: map,
+                                        timeElapsed: Common.toMMSS(match.finishedDate - match.startedDate)
                                     });
 
                                     callback();
@@ -133,7 +134,8 @@ module.exports = function(app) {
                             MinecraftMap.findOne({_id: match.map}, function(err, map) {
                                 recentMatches.push({
                                     match: match,
-                                    loadedMap: map
+                                    loadedMap: map,
+                                    timeElapsed: Common.toMMSS(match.finishedDate - match.startedDate)
                                 });
 
                                 callback();
