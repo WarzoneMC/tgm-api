@@ -104,7 +104,7 @@ module.exports = function(app) {
                                     recentMatches.push({
                                         match: match,
                                         loadedMap: map,
-                                        timeElapsed: Common.toMMSS(match.finishedDate - match.startedDate)
+                                        timeElapsed: Common.toMMSS((match.finishedDate - match.startedDate) / 1000)
                                     });
 
                                     callback();
@@ -135,7 +135,7 @@ module.exports = function(app) {
                                 recentMatches.push({
                                     match: match,
                                     loadedMap: map,
-                                    timeElapsed: Common.toMMSS(match.finishedDate - match.startedDate)
+                                    timeElapsed: Common.toMMSS((match.finishedDate - match.startedDate) / 1000)
                                 });
 
                                 callback();
@@ -333,9 +333,6 @@ module.exports = function(app) {
                         })
                     }
                 ], function(err) {
-                    miscData = {
-                        timeElapsed: match.finishedDate - match.startedDate
-                    };
                     res.json({
                         match: match,
                         playersLoaded: usersCombined,
@@ -345,7 +342,7 @@ module.exports = function(app) {
                         deathsLoaded: deathsLoaded,
                         mapLoaded: mapLoaded,
                         teamsLoaded: teamsLoaded,
-                        miscData: miscData
+                        timeElapsed: Common.toMMSS((match.finishedDate - match.startedDate) / 1000)
                     })
                 })
             } else {
