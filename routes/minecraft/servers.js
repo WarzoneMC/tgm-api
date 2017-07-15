@@ -48,37 +48,30 @@ module.exports = function(app) {
         });
 
         var array = new Array();
+        array.push({
+            ip: "teamgg",
+            port: 1,
+            _id: process.server._id.toString(),
+            name: "TeamGG",
+            motd: "Team.gg - Team PvP Combat",
+            rank: "DIAMOND",
+            player_count: req.body.playerCount + req.body.spectatorCount,
+            max_players: req.body.maxPlayers
+        });
 
-        async.series([
-            //assemble array
-            function(callback) {
-                array.push({
-                    ip: "teamgg",
-                    port: 1,
-                    _id: process.server._id.toString(),
-                    name: "TeamGG",
-                    motd: "Team.gg - Team PvP Combat",
-                    rank: "DIAMOND",
-                    player_count: req.body.playerCount + req.body.spectatorCount,
-                    max_players: req.body.maxPlayers
-                });
-                callback();
+        var options = {
+            url: config.minehut.url + "/servers/heartbeat",
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': config.minehut.auth
+            },
+            json: {
+                servers: array
             }
-        ], function(err) {
-            var options = {
-                url: config.minehut.url + "/servers/heartbeat",
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-access-token': config.minehut.auth
-                },
-                json: {
-                    servers: array
-                }
-            };
-            request(options, function(err, res, body) {
-                if(err) console.log(err);
-            });
+        };
+        request(options, function(err, res, body) {
+            if(err) console.log(err);
         });
     });
 
