@@ -51,7 +51,7 @@ module.exports = function(app) {
         array.push({
             ip: "teamgg",
             port: 1,
-            _id: new mongoose.Types.ObjectId(),
+            _id: req.body._id,
             name: "TeamGG",
             motd: "Team.gg - Team PvP Combat",
             rank: "DIAMOND",
