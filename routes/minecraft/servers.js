@@ -51,7 +51,7 @@ module.exports = function(app) {
         array.push({
             ip: "teamgg",
             port: 1,
-            _id: process.server._id.toString(),
+            _id: req.body.id,
             name: "TeamGG",
             motd: "Team.gg - Team PvP Combat",
             rank: "DIAMOND",
