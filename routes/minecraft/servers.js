@@ -55,6 +55,14 @@ module.exports = function(app) {
             name: "TeamGG",
             motd: "Team.gg - Team PvP Combat",
             rank: "DIAMOND",
+            rank_full: {
+                "id": "DIAMOND",
+                "name": "Diamond",
+                "ram": 4096,
+                "maxPlayers": 200,
+                "maxPlugins": 1000,
+                "worldBorder": 29999984
+            },
             player_count: req.body.playerCount + req.body.spectatorCount,
             max_players: req.body.maxPlayers
         });
