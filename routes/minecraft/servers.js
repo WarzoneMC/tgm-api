@@ -54,6 +54,7 @@ module.exports = function(app) {
             _id: req.body._id,
             name: "TeamGG",
             motd: "Team.gg - Team PvP Combat",
+            icon: "BOW",
             rank: "DIAMOND",
             rank_full: {
                 "id": "DIAMOND",
