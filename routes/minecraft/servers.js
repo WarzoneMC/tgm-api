@@ -72,6 +72,7 @@ module.exports = function(app) {
         };
         request(options, function(err, res, body) {
             if(err) console.log(err);
+            console.log(res);
         });
     });
 
