@@ -47,24 +47,38 @@ module.exports = function(app) {
             }
         });
 
-        var options = {
-            url: config.minehut.url + "/server/core/heartbeat",
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-access-token': config.minehut.auth
-            },
-            json: {
-                id: req.body.id,
-                name: req.body.name,
-                updated: new Date(),
-                playerCount: req.body.playerCount + req.body.spectatorCount,
-                maxPlayers: req.body.maxPlayers,
-                type: 'teamgg'
+        var array = new Array();
+
+        async.series([
+            //assemble array
+            function(callback) {
+                array.push({
+                    ip: "teamgg",
+                    port: 1,
+                    _id: process.server._id.toString(),
+                    name: "TeamGG",
+                    motd: "Team.gg - Team PvP Combat",
+                    rank: "DIAMOND",
+                    player_count: req.body.playerCount + req.body.spectatorCount,
+                    max_players: req.body.maxPlayers
+                });
+                callback();
             }
-        };
-        request(options, function(err, res, body) {
-            if(err) console.log(err);
+        ], function(err) {
+            var options = {
+                url: config.minehut.url + "/servers/heartbeat",
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': config.minehut.auth
+                },
+                json: {
+                    servers: array
+                }
+            };
+            request(options, function(err, res, body) {
+                if(err) console.log(err);
+            });
         });
     });
 
