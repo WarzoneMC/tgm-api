@@ -52,8 +52,8 @@ module.exports = function(app) {
             ip: "teamgg",
             port: 1,
             _id: req.body._id,
-            name: "TeamGG",
-            motd: "Team.gg (PVP) - A Minehut Hosted Server.",
+            name: "Warzone",
+            motd: "Warzone - A Minehut hosted PvP server!",
             icon: "BOW",
             rank: "DIAMOND",
             rank_full: {
