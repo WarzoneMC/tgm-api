@@ -1,7 +1,7 @@
 {
-  "name": "teamgg-api",
+  "name": "warzone-api",
   "version": "1.0.0",
-  "description": "The API for the TeamGG gamemode.",
+  "description": "The API for the Warzone gamemode.",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
