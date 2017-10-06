@@ -19,7 +19,9 @@ var MinecraftUser = new Schema({
     wins                    : Number,
     losses                  : Number,
     matches                 : [ObjectId],
-    ranks                   : [ObjectId]
+    ranks: [ObjectId],
+    
+    wool_destroys           : Number
 });
 MinecraftUser.methods.toJSON = function() {
     var obj = this.toObject();

@@ -8,7 +8,18 @@ var MinecraftDeath = mongoose.model('minecraft_death');
 var MinecraftMatch = mongoose.model('minecraft_match');
 var MinecraftMap = mongoose.model('minecraft_map');
 
-module.exports = function(app) {
+module.exports = function (app) {
+    
+    /**
+     * Increments user's wool break count by 1.
+     *
+     * Called when user breaks a wool mid-match.
+     */
+    app.post('/mc/match/destroy_wool', verifyServer, (req, res) => {
+        MinecraftUser.update({ uuid: req.body.uuid }, { $inc: { wool_destroys: 1 } }, (err) => {
+            res.json({});
+        })
+    })
 
     /**
      * body: MatchLoadRequest.java
