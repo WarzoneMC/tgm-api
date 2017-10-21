@@ -1,9 +1,9 @@
-var mongoose = require('mongoose');
+let mongoose = require('mongoose');
 
-var Schema = mongoose.Schema,
+let Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
-var MinecraftUser = new Schema({
+let MinecraftUser = new Schema({
     name                    : String,
     nameLower              : String,
     uuid                    : String,
@@ -11,7 +11,7 @@ var MinecraftUser = new Schema({
     initialJoinDate       : Number,
     lastOnlineDate        : Number,
 
-    ranks                   : [String],
+    ranks                   : [ObjectId],
     ips                     : [String],
 
     kills                   : Number,
@@ -24,14 +24,21 @@ var MinecraftUser = new Schema({
     wool_destroys           : Number
 });
 MinecraftUser.methods.toJSON = function() {
-    var obj = this.toObject();
+    let obj = this.toObject();
     delete obj.password;
     delete obj.ips;
     return obj;
 };
 mongoose.model('minecraft_user', MinecraftUser);
 
-var MinecraftServer = new Schema({
+let MinecraftRank = new Schema({
+    prefix: String,
+    permissions: [String],
+    staff: Boolean
+});
+mongoose.model('minecraft_rank', MinecraftRank);
+
+let MinecraftServer = new Schema({
     name               : String,
     nameLower         : String,
     id                 : String,
@@ -46,7 +53,7 @@ var MinecraftServer = new Schema({
 });
 mongoose.model('minecraft_server', MinecraftServer);
 
-var MinecraftDeath = new Schema({
+let MinecraftDeath = new Schema({
     player          : ObjectId,
     killer          : ObjectId,
 
@@ -62,7 +69,7 @@ var MinecraftDeath = new Schema({
 });
 mongoose.model('minecraft_death', MinecraftDeath);
 
-var MinecraftMap = new Schema({
+let MinecraftMap = new Schema({
     name            : String,
     nameLower       : String,
     version         : String,
@@ -80,7 +87,7 @@ var MinecraftMap = new Schema({
 });
 mongoose.model('minecraft_map', MinecraftMap);
 
-var MinecraftMatch = new Schema({
+let MinecraftMatch = new Schema({
     map             : ObjectId,
     initializedDate : Number,
     startedDate     : Number,

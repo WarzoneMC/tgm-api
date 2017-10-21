@@ -1,10 +1,11 @@
-var mongoose = require("mongoose");
-var verifyServer = require('./verifyServer');
-var async = require('async');
+let mongoose = require("mongoose");
+let verifyServer = require('./verifyServer');
+let async = require('async');
 
-var MinecraftUser = mongoose.model('minecraft_user');
-var MinecraftDeath = mongoose.model('minecraft_death');
-var MinecraftMatch = mongoose.model('minecraft_match');
+let MinecraftUser = mongoose.model('minecraft_user');
+let MinecraftDeath = mongoose.model('minecraft_death');
+let MinecraftMatch = mongoose.model('minecraft_match');
+let MinecraftRank = mongoose.model('minecraft_rank');
 
 module.exports = function(app) {
 
@@ -15,8 +16,8 @@ module.exports = function(app) {
                 res.json({error: true});
             }
             if(user) {
-                var deaths = new Array();
-                var matches = new Array();
+                let deaths = new Array();
+                let matches = new Array();
 
                 async.series([
                     function(callback) {
@@ -30,7 +31,7 @@ module.exports = function(app) {
                                     if(err) {
                                         console.log(err);
                                     }
-                                    var containing = new Array();
+                                    let containing = new Array();
                                     async.eachSeries(foundDeaths, function(death, next) {
                                         containing.push(death.player);
                                         if(death.killer) {
@@ -101,7 +102,7 @@ module.exports = function(app) {
                 if(err) {
                     console.log(err);
                 }
-                var containing = new Array();
+                let containing = new Array();
                 async.eachSeries(foundDeaths, function(death, next) {
                     containing.push(death.player);
                     if(death.killer) {
@@ -141,7 +142,7 @@ module.exports = function(app) {
             console.log('body: ' + JSON.stringify(req.body, null, 2));
 
             if(user) {
-                var ips = user.ips;
+                let ips = user.ips;
                 if(ips.indexOf(req.body.ip) < 0) {
                     ips.push(req.body.ip);
                 }
@@ -178,4 +179,45 @@ module.exports = function(app) {
         });
     });
 
+    /**
+     * Body:
+     *  - rank: String (Object Id)
+     */
+    app.post('/mc/player/:name/setrank', verifyServer, (req, res) => {
+        if(!req.body.rank) {
+            res.status(401).json({error: "Rank not included in request.", rankNotFound: true});
+            return;
+        }
+
+        let userId = new mongoose.Types.ObjectId(req.body.rank);
+        MinecraftRank.find({_id: userId}, (err, rank) => {
+            if(!rank) {
+                console.log('rank not found: ' + req.body.rank);
+                res.status(401).json({error: "Rank not found", rankNotFound: true});
+                return;
+            }
+
+            MinecraftUser.find({nameLower: req.params.name.toLowerCase()}, (err, user) => {
+                if(!user) {
+                    console.log('player not found: ' + req.params.name);
+                    res.status(401).json({error: "Player not found", userNotFound: true});
+                    return;
+                }
+
+                //user already has rank
+                if(user.ranks && user.ranks.indexOf(userId) > -1 ) {
+                    res.json({});
+                    return;
+                }
+
+                MinecraftUser.update({_id: userId}, {
+                    $addToSet: {ranks: rank._id}
+                }, (err) => {
+                    console.log('Added ' + rank.prefix + ' to ' + user.name + '\'s rank set.');
+                    res.json({});
+                    return;
+                })
+            })
+        })
+    })
 }
