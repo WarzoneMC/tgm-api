@@ -178,46 +178,4 @@ module.exports = function(app) {
             }
         });
     });
-
-    /**
-     * Body:
-     *  - rank: String (Object Id)
-     */
-    app.post('/mc/player/:name/setrank', verifyServer, (req, res) => {
-        if(!req.body.rank) {
-            res.status(401).json({error: "Rank not included in request.", rankNotFound: true});
-            return;
-        }
-
-        let userId = new mongoose.Types.ObjectId(req.body.rank);
-        MinecraftRank.find({_id: userId}, (err, rank) => {
-            if(!rank) {
-                console.log('rank not found: ' + req.body.rank);
-                res.status(401).json({error: "Rank not found", rankNotFound: true});
-                return;
-            }
-
-            MinecraftUser.find({nameLower: req.params.name.toLowerCase()}, (err, user) => {
-                if(!user) {
-                    console.log('player not found: ' + req.params.name);
-                    res.status(401).json({error: "Player not found", userNotFound: true});
-                    return;
-                }
-
-                //user already has rank
-                if(user.ranks && user.ranks.indexOf(userId) > -1 ) {
-                    res.json({});
-                    return;
-                }
-
-                MinecraftUser.update({_id: userId}, {
-                    $addToSet: {ranks: rank._id}
-                }, (err) => {
-                    console.log('Added ' + rank.prefix + ' to ' + user.name + '\'s rank set.');
-                    res.json({});
-                    return;
-                })
-            })
-        })
-    })
 }

@@ -29,6 +29,7 @@ require('./routes/minecraft/maps')(app);
 require('./routes/minecraft/leaderboards')(app);
 require('./routes/minecraft/matches')(app);
 require('./routes/minecraft/deaths')(app);
+require('./routes/minecraft/ranks')(app);
 
 const port = config.port;
 
