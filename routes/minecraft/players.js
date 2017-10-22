@@ -137,7 +137,7 @@ module.exports = function(app) {
         console.log('login request');
         MinecraftUser.findOne({
             uuid: req.body.uuid
-        }, function(err, user) {
+        }).lean().exec(function(err, user) {
             if(err) throw err;
             console.log('body: ' + JSON.stringify(req.body, null, 2));
 
@@ -146,17 +146,24 @@ module.exports = function(app) {
                 if(ips.indexOf(req.body.ip) < 0) {
                     ips.push(req.body.ip);
                 }
-                MinecraftUser.update({uuid: req.body.uuid}, {$set: {
-                    name: req.body.name,
-                    nameLower: req.body.name.toLowerCase(),
-                    lastOnlineDate: new Date().getTime(),
-                    ips: ips
-                }}, function(err) {
-                    res.json(user);
-                    console.log('user: ' + JSON.stringify(user, null, 2));
-                    console.log('Minecraft User login: ' + user.name);
-                });
+
+                user.loadRanks((ranks) => {
+                    user.ranksLoaded = ranks;
+                    MinecraftUser.update({ uuid: req.body.uuid }, {
+                        $set: {
+                            name: req.body.name,
+                            nameLower: req.body.name.toLowerCase(),
+                            lastOnlineDate: new Date().getTime(),
+                            ips: ips
+                        }
+                    }, function (err) {
+                        res.json(user);
+                        console.log('user: ' + JSON.stringify(user, null, 2));
+                        console.log('Minecraft User login: ' + user.name);
+                    });
+                })
             } else {
+
                 user = new MinecraftUser({
                     name: req.body.name,
                     nameLower: req.body.name.toLowerCase(),

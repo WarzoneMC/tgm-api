@@ -29,6 +29,13 @@ MinecraftUser.methods.toJSON = function() {
     delete obj.ips;
     return obj;
 };
+MinecraftUser.methods.loadRanks = function (callback) {
+    MinecraftRank.find({ _id: { $in: this.ranks } }, (err, ranks) => {
+        if (err) console.log(err);
+        
+        callback(ranks);
+    })
+};
 mongoose.model('minecraft_user', MinecraftUser);
 
 let MinecraftRank = new Schema({
