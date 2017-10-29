@@ -147,7 +147,8 @@ module.exports = function(app) {
                     ips.push(req.body.ip);
                 }
 
-                user.loadRanks((ranks) => {
+                MinecraftRank.find({ _id: { $in: user.ranks } }, (err, ranks) => {
+                    if (err) console.log(err);
                     user.ranksLoaded = ranks;
                     MinecraftUser.update({ uuid: req.body.uuid }, {
                         $set: {
