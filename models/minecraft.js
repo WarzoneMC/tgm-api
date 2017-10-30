@@ -39,9 +39,10 @@ MinecraftUser.methods.loadRanks = function (callback) {
 mongoose.model('minecraft_user', MinecraftUser);
 
 let MinecraftRank = new Schema({
-    prefix: String,
-    permissions: [String],
-    staff: Boolean
+    priority            : Number,
+    prefix              : String,
+    permissions         : [String],
+    staff               : Boolean
 });
 mongoose.model('minecraft_rank', MinecraftRank);
 
