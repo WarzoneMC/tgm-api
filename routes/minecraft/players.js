@@ -6,6 +6,8 @@ var MinecraftUser = mongoose.model('minecraft_user');
 var MinecraftDeath = mongoose.model('minecraft_death');
 var MinecraftMatch = mongoose.model('minecraft_match');
 
+var Punishment = mongoose.model('punishment');
+
 module.exports = function(app) {
 
     app.get('/mc/player/:name', function(req, res, next) {
@@ -174,6 +176,45 @@ module.exports = function(app) {
                     res.json(user);
                     console.log('Registered new minecraft user: ' + user.name);
                 })
+            }
+        });
+    });
+
+    app.post('/mc/player/issue_punishment', verifyServer, function(req, res) {
+        MinecraftUser.findOne({ nameLower: req.body.name.toLowerCase() }, function(err, punished) {
+            if (punished) {
+                MinecraftUser.findOne({ uuid: req.body.punisherUuid }, function(err, punisher) {
+                    if (punisher) {
+                        var punishment = new Punishment({
+                            punisher: punisher._id,
+                            punished: punished._id,
+
+                            type: req.body.type.toUpperCase(),
+
+                            issued: Date.now().getTime(),
+                            expires: Date.now().getTime() + req.body.length,
+
+                            reason: req.body.reason,
+                            reverted: false
+                        });
+                        punishment.save(function(err) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            
+                            res.json({
+                                punishment: punishment,
+                                kickable: punishment.shouldKick(),
+                                
+                                name: punished.name
+                            });
+                        });
+                    } else {
+                        res.json({notFound: true});
+                    }
+                });
+            } else {
+                res.json({notFound: true});
             }
         });
     });
