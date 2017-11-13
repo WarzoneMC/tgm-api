@@ -3,6 +3,28 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
+var Punishment = new Schema({
+    punisher: ObjectId,
+    punished: ObjectId,
+
+    type: String,
+    
+    issued: Number,
+    expires: Number,
+    reason: String,
+    reverted: Boolean
+});
+
+Punishment.methods.isActive = function() {
+    return this.expires > Date.now().getTime();
+};
+
+Punishment.methods.shouldKick = function() {
+    return this.type.toLowerCase() === 'ban' || this.type.toLowerCase() === 'kick';
+};
+
+mongoose.model('punishment', Punishment);
+
 var MinecraftUser = new Schema({
     name                    : String,
     nameLower              : String,
@@ -13,6 +35,8 @@ var MinecraftUser = new Schema({
 
     ranks                   : [String],
     ips                     : [String],
+
+
 
     kills                   : Number,
     deaths                  : Number,
