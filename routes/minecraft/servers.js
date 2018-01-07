@@ -88,7 +88,7 @@ module.exports = function(app) {
                 }
             }
         };        
-        request(config.minehut.url + '/server/warzone/heartbeat', options, (error, response, body) => {
+        request(options, (error, response, body) => {
             console.log('Response:');
             console.log(body);
         });
