@@ -67,30 +67,6 @@ module.exports = function(app) {
                 })
             }
         });
-
-        var options = {
-            url: config.minehut.url + "/server/warzone/heartbeat",
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-access-token': config.minehut.auth
-            },
-            json: {
-                heartbeat: {
-                    online: true,
-                    playerCount: req.body.playerCount + req.body.spectatorCount,
-                    timeNoPlayers: 0,
-                    players: req.body.players,
-                    startedAt: req.body.startedAt,
-                    stoppedAt: 0,
-                    exited: false
-                }
-            }
-        };        
-        request(options, (error, response, body) => {
-            console.log('Response:');
-            console.log(body);
-        });
     });
 
 };
