@@ -70,7 +70,7 @@ module.exports = function(app) {
 
         var options = {
             url: config.minehut.url + "/server/warzone/heartbeat",
-            method: 'POST',
+            //method: 'POST',
             followAllRedirects: true,
             headers: {
                 'Content-Type': 'application/json',
@@ -88,8 +88,9 @@ module.exports = function(app) {
                 }
             }
         };
-        request(options, function(err, res, body) {
-            if(err) console.log(err);
+        request.post(config.minehut.url + '/server/warzone/heartbeat',
+        options,
+        (error, response, body) => {
             console.log(body);
         });
     });
