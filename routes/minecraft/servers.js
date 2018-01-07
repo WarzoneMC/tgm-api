@@ -87,10 +87,9 @@ module.exports = function(app) {
                     exited: false
                 }
             }
-        };
-        request.post(config.minehut.url + '/server/warzone/heartbeat',
-        options,
-        (error, response, body) => {
+        };        
+        request(config.minehut.url + '/server/warzone/heartbeat', options, (error, response, body) => {
+            console.log('Response:');
             console.log(body);
         });
     });
