@@ -71,6 +71,7 @@ module.exports = function(app) {
         var options = {
             url: config.minehut.url + "/server/warzone/heartbeat",
             method: 'POST',
+            followAllRedirects: true,
             headers: {
                 'Content-Type': 'application/json',
                 'x-access-token': config.minehut.auth
