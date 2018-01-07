@@ -8,6 +8,27 @@ var MinecraftMap = mongoose.model('minecraft_map');
 var verifyServer = require('./verifyServer');
 
 module.exports = function(app) {
+    app.post('/mc/server/stats', function(req, res) {
+        MinecraftServer.findOne({
+            name: req.body.name
+        }, function(err, server) {
+            if (server) {
+                res.json({
+                    name: server.name,
+                    nameLower: server.name.toLowerCase(),
+                    
+                    playerCount: server.playerCount,
+                    spectatorCount: server.spectatorCount,
+                    maxPlayers: server.maxPlayers,
+                    map: server.map,
+                    gameType: server.gameType
+                });
+            } else {
+                res.json({error: "Server not found"});
+            }
+        });
+    });
+
     app.post('/mc/server/heartbeat', verifyServer, function(req, res) {
         MinecraftServer.findOne({
             name: req.body.name
@@ -47,36 +68,23 @@ module.exports = function(app) {
             }
         });
 
-        var array = new Array();
-        array.push({
-            ip: "teamgg",
-            port: 1,
-            _id: req.body._id,
-            name: "Warzone",
-            motd: "Warzone - A Minehut hosted PvP server!",
-            icon: "BOW",
-            rank: "DIAMOND",
-            rank_full: {
-                "id": "DIAMOND",
-                "name": "Diamond",
-                "ram": 4096,
-                "maxPlayers": 200,
-                "maxPlugins": 1000,
-                "worldBorder": 29999984
-            },
-            player_count: req.body.playerCount + req.body.spectatorCount,
-            max_players: req.body.maxPlayers
-        });
-
         var options = {
-            url: config.minehut.url + "/servers/heartbeat",
+            url: config.minehut.url + "/server/warzone/heartbeat",
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'x-access-token': config.minehut.auth
             },
             json: {
-                servers: array
+                heartbeat: {
+                    online: true,
+                    playerCount: req.body.playerCount + req.body.spectatorCount,
+                    timeNoPlayers: 0,
+                    players: req.body.players,
+                    startedAt: req.body.startedAt,
+                    stoppedAt: 0,
+                    exited: false
+                }
             }
         };
         request(options, function(err, res, body) {
