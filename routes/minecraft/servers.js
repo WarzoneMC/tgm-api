@@ -22,6 +22,8 @@ module.exports = function(app) {
                     playerCount: server.playerCount,
                     spectatorCount: server.spectatorCount,
                     maxPlayers: server.maxPlayers,
+
+                    lastOnline: server.lastOnline,
                     
                     map: server.map,
                     gametype: server.gametype
