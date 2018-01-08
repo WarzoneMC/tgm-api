@@ -14,12 +14,15 @@ module.exports = function(app) {
         }, function(err, server) {
             if (server) {
                 res.json({
-                    name: server.name,
-                    nameLower: server.name.toLowerCase(),
+                    _id: server._id,
+                    name: 'Warzone',
+                    motd: 'Warzone - A Minehut hosted PvP server!',
                     
+                    players: server.playerNames,
                     playerCount: server.playerCount,
                     spectatorCount: server.spectatorCount,
                     maxPlayers: server.maxPlayers,
+                    
                     map: server.map,
                     gameType: server.gameType
                 });
@@ -43,6 +46,7 @@ module.exports = function(app) {
                 id: req.body.id,
                 lastOnline: new Date().getTime(),
                 players: req.body.players,
+                playerNames: req.body.playerNames,
                 playerCount: req.body.playerCount,
                 spectatorCount: req.body.spectatorCount,
                 maxPlayers: req.body.maxPlayers,
