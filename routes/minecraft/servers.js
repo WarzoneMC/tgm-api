@@ -24,7 +24,7 @@ module.exports = function(app) {
                     maxPlayers: server.maxPlayers,
                     
                     map: server.map,
-                    gameType: server.gameType
+                    gametype: server.gametype
                 });
             } else {
                 res.json({error: "Server not found"});
