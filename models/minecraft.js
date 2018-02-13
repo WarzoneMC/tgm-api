@@ -3,9 +3,12 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
-var Punishment = new Schema({
+var MinecraftPunishment = new Schema({
     punisher: ObjectId,
     punished: ObjectId,
+
+    ip: String,
+    ip_ban: Boolean, 
 
     type: String,
     
@@ -15,15 +18,23 @@ var Punishment = new Schema({
     reverted: Boolean
 });
 
-Punishment.methods.isActive = function() {
-    return this.expires > Date.now().getTime();
+MinecraftPunishment.methods.isActive = function() {
+    if (this.reverted == true) {
+        return false;
+    } else {
+        if (this.expires == -1) {
+            return true;
+        } else {
+            return this.expires > new Date().getTime()
+        }
+    }
 };
 
-Punishment.methods.shouldKick = function() {
+MinecraftPunishment.methods.shouldKick = function() {
     return this.type.toLowerCase() === 'ban' || this.type.toLowerCase() === 'kick';
 };
 
-mongoose.model('punishment', Punishment);
+mongoose.model('minecraft_punishment', MinecraftPunishment);
 
 var MinecraftUser = new Schema({
     name                    : String,
@@ -45,7 +56,8 @@ var MinecraftUser = new Schema({
     matches                 : [ObjectId],
     ranks: [ObjectId],
     
-    wool_destroys           : Number
+    wool_destroys           : Number,
+    punishments             : [MinecraftPunishment]
 });
 MinecraftUser.methods.toJSON = function() {
     var obj = this.toObject();
