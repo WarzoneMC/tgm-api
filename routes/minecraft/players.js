@@ -308,6 +308,7 @@ module.exports = function(app) {
 
     app.post('/mc/player/revert_punishment', verifyServer, function(req, res) {
         MinecraftPunishment.findOne({ _id: req.body.id }, function(err, punishment) {
+            var success = punishment.reverted == false;
             if (err) console.log(err);
             if (punishment) {
                 MinecraftPunishment.update({ _id: req.body.id }, {$set: { reverted: true }}, function(err) {
@@ -320,7 +321,8 @@ module.exports = function(app) {
                         MinecraftUser.findOne({_id: id}, function (err, user) {
                             loadedUsers.push({
                                 name: user.name,
-                                id: user._id
+                                id: user._id,
+                                success: success
                             });
                             next();
                         });
