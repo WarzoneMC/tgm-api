@@ -321,8 +321,7 @@ module.exports = function(app) {
                         MinecraftUser.findOne({_id: id}, function (err, user) {
                             loadedUsers.push({
                                 name: user.name,
-                                id: user._id,
-                                success: success
+                                id: user._id
                             });
                             next();
                         });
@@ -330,7 +329,8 @@ module.exports = function(app) {
                         punishment.reverted = true;
                         res.json({
                             punishment: punishment,
-                            loadedUsers: loadedUsers
+                            loadedUsers: loadedUsers,
+                            success: success
                         });
                         console.log("Reverted punishment: " + punishment._id); 
                     });
