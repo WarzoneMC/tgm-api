@@ -232,37 +232,34 @@ module.exports = function(app) {
                 if (punished) {
                     MinecraftUser.find({uuid: req.body.punisherUuid}).sort('-lastOnlineDate').limit(1).exec(function(err, punishers){
                         var punisher = punishers[0];
-                        if (punisher) {
-                            var punishment = new MinecraftPunishment({
-                                punisher: punisher._id,
-                                punished: punished._id,
+                        var punishment = new MinecraftPunishment({
+                            punisher: punisher ? punisher._id : null,
+                            punished: punished._id,
+                            
+                            ip: (req.body.ip ? req.body.ip : punished.ips[punished.ips.length - 1]),
+                            ip_ban: (req.body.ip_ban ? req.body.ip_ban : false),
+
+                            type: req.body.type.toUpperCase(),
+
+                            issued: new Date().getTime(),
+                            expires: (req.body.length != -1 ? new Date().getTime() + req.body.length : -1),
+
+                            reason: req.body.reason,
+                            reverted: false
+                        });
+                        punishment.save(function(err) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            console.log("Saved punishment: " + JSON.stringify(punishment))
+                            res.json({
+                                punishment: punishment,
+                                kickable: punishment.shouldKick(),
                                 
-                                ip: (req.body.ip ? req.body.ip : punished.ips[punished.ips.length - 1]),
-                                ip_ban: (req.body.ip_ban ? req.body.ip_ban : false),
-
-                                type: req.body.type.toUpperCase(),
-
-                                issued: new Date().getTime(),
-                                expires: (req.body.length != -1 ? new Date().getTime() + req.body.length : -1),
-
-                                reason: req.body.reason,
-                                reverted: false
+                                name: punished.name
                             });
-                            punishment.save(function(err) {
-                                if (err) {
-                                    console.log(err);
-                                }
-                                console.log("Saved punishment: " + JSON.stringify(punishment))
-                                res.json({
-                                    punishment: punishment,
-                                    kickable: punishment.shouldKick(),
-                                    
-                                    name: punished.name
-                                });
-                            });
-                        } else {
-                            res.json({notFound: true});
-                        }
+                        });
+                        
                     });
                 } else {
                     res.json({notFound: true});
@@ -387,10 +384,10 @@ module.exports = function(app) {
                         if (err) console.log(err);
                         var ids = [];
                         async.eachSeries(punishments, function (punishment, next) {
-                            if (!ids.includes(punishment.punisher.toString())) {
+                            if (punishment.punisher && !ids.includes(punishment.punisher.toString())) {
                                 ids.push(punishment.punisher.toString());
                             }
-                            if (!ids.includes(punishment.punished.toString())) {
+                            if (punishment.punished && !ids.includes(punishment.punished.toString())) {
                                 ids.push(punishment.punished.toString());
                             }
                             next();
