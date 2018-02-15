@@ -166,7 +166,8 @@ module.exports = function(app) {
                                     reverted: false
                                 }, {
                                     ip: req.body.ip,
-                                    ip_ban: true
+                                    ip_ban: true,
+                                    reverted: false
                                 }
                             ]
                         }).sort('+issued').exec(function (err, punishes) {
