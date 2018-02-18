@@ -225,7 +225,7 @@ module.exports = function(app) {
                     MinecraftUser.findOne({_id: pun.punished}, function(err, punished){
                         if (err) console.log(err);
                         if (punished) {
-                            var punishedLoaded = punisher.toJSON();
+                            var punishedLoaded = punished.toJSON();
                             delete punishedLoaded.matches;
                             punishment.punishedLoaded = punishedLoaded;
                         } else {
