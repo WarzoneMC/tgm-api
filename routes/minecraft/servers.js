@@ -8,7 +8,7 @@ var MinecraftMap = mongoose.model('minecraft_map');
 var verifyServer = require('./verifyServer');
 
 module.exports = function(app) {
-    app.get('/mc/server/stats', function(req, res) {
+    app.post('/mc/server/stats', function(req, res) {
         MinecraftServer.findOne({
             name: req.body.name
         }, function(err, server) {
