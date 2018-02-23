@@ -101,7 +101,8 @@ module.exports = function (app) {
      * Removes a rank from a user's profile
      *
      * Post Body:
-     *  - rank: String (Object Id)
+     *  - rankId: String (Object Id)
+     *  - rankName: String (You may use this instead of rankId)
      */
     app.post('/mc/player/:name/rank/remove', verifyServer, (req, res) => {
         if (!req.body.rankId && !req.body.rankName) {
