@@ -11,18 +11,43 @@ module.exports = function (app) {
         MinecraftRank.find({}, (err, ranks) => {
             res.json(ranks);
         })
-    })
+    });
 
     app.get('/mc/player/:name/ranks', verifyServer, (req, res) => {
-        MinecraftUser.find({ nameLower: req.params.name.toLowerCase() }).sort("-lastOnlineDate").limit(1).exec((err, user) => {
+        MinecraftUser.find({ nameLower: req.params.name.toLowerCase() }).sort("-lastOnlineDate").limit(1).exec((err, users) => {
+            var user = users[0];
             if (!user) {
                 res.status(401).json({ notFound: true });
                 return;
             }
-
-            res.json({ ranks: user.ranks });
+            MinecraftRank.find({ _id: { $in: user.ranks }}, (err, ranks) => {
+                res.json(ranks);
+            });
         });
-    })
+    });
+
+    app.post('/mc/rank/create', verifyServer, (req, res) => {
+        if (!req.body.rank) {
+            res.status(401).json({ message: "Rank not included in request.", error: true });
+            return;
+        }
+        var rank = new MinecraftRank({
+            name: req.body.rank.name,
+            priority: req.body.rank.priority,
+            prefix: req.body.rank.prefix,
+            permissions: req.body.rank.permissions,
+            staff: req.body.rank.staff
+        });
+        rank.save(function(err) {
+            if(err) {
+                console.log(err);
+            }
+            res.json({rank: rank});
+            console.log('Registered new minecraft rank: ' + rank.name);
+        })
+        
+
+    });
 
     /**
      * Adds a rank to a user's profile
