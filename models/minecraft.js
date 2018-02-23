@@ -19,7 +19,6 @@ let MinecraftUser = new Schema({
     wins                    : Number,
     losses                  : Number,
     matches                 : [ObjectId],
-    ranks: [ObjectId],
     
     wool_destroys           : Number
 });
