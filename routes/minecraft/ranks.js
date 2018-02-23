@@ -27,16 +27,16 @@ module.exports = function (app) {
     });
 
     app.post('/mc/rank/create', verifyServer, (req, res) => {
-        if (!req.body.rank) {
+        if (!req.body.name) {
             res.status(401).json({ message: "Rank not included in request.", error: true });
             return;
         }
         var rank = new MinecraftRank({
-            name: req.body.rank.name,
-            priority: req.body.rank.priority,
-            prefix: req.body.rank.prefix,
-            permissions: req.body.rank.permissions,
-            staff: req.body.rank.staff
+            name: req.body.name,
+            priority: req.body.priority,
+            prefix: req.body.prefix,
+            permissions: req.body.permissions,
+            staff: req.body.staff
         });
         rank.save(function(err) {
             if(err) {
@@ -45,8 +45,37 @@ module.exports = function (app) {
             res.json({rank: rank});
             console.log('Registered new minecraft rank: ' + rank.name);
         })
-        
+    });
 
+    app.post('/mc/rank/delete', verifyServer, (req, res) => {
+        if (!req.body.name && !req.body._id) {
+            res.status(401).json({ message: "Rank not included in request.", error: true });
+            return;
+        }
+        if (req.body._id) {
+            MinecraftRank.findOne({_id: req.body._id}, (err, rank) => {
+                if (!rank) {
+                    res.json({message: "Rank not found", error: true});
+                    return;
+                }
+                MinecraftRank.remove({_id: req.body._id}, (err, obj) => {
+                    console.log("Deleted rank " + rank.name);
+                    res.json({rank: rank});
+                });
+            });
+            
+        } else if (req.body.name) {
+            MinecraftRank.findOne({name: req.body.name}, (err, rank) => {
+                if (!rank) {
+                    res.json({message: "Rank not found", error: true});
+                    return;
+                }
+                MinecraftRank.remove({name: req.body.name}, (err, obj) => {
+                    console.log("Deleted rank " + rank.name);
+                    res.json({rank: rank});
+                });
+            });
+        }
     });
 
     /**
