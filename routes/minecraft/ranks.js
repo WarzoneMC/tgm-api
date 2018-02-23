@@ -3,8 +3,6 @@ let verifyServer = require('./verifyServer');
 let async = require('async');
 
 let MinecraftUser = mongoose.model('minecraft_user');
-let MinecraftDeath = mongoose.model('minecraft_death');
-let MinecraftMatch = mongoose.model('minecraft_match');
 let MinecraftRank = mongoose.model('minecraft_rank');
 
 module.exports = function (app) {
@@ -15,64 +13,89 @@ module.exports = function (app) {
         })
     })
 
-    /**
-     * Probably won't be used since ranks are cached in player objects
-     * in TGM.
-     */
     app.get('/mc/player/:name/ranks', verifyServer, (req, res) => {
-        MinecraftUser.findOne({ nameLower: req.params.name.toLowerCase() }, (err, user) => {
+        MinecraftUser.find({ nameLower: req.params.name.toLowerCase() }).sort("-lastOnlineDate").limit(1).exec((err, user) => {
             if (!user) {
-                res.status(401).json({ error: "User not found", userNotFound: true });
+                res.status(401).json({ notFound: true });
                 return;
             }
 
             res.json({ ranks: user.ranks });
-        })
+        });
     })
 
     /**
      * Adds a rank to a user's profile
      *
      * Post Body:
-     *  - rank: String (Object Id)
+     *  - rankId: String (Object Id)
+     *  - rankName: String (You may use this instead of rankId)
      */
     app.post('/mc/player/:name/rank/add', verifyServer, (req, res) => {
-        if (!req.body.rank) {
-            res.status(401).json({ error: "Rank not included in request.", rankNotFound: true });
+        if (!req.body.rankId && !req.body.rankName) {
+            res.status(401).json({ message: "Rank not included in request.", error: true });
             return;
         }
 
-        let rankId = new mongoose.Types.ObjectId(req.body.rank);
-        MinecraftRank.findOne({ _id: rankId }, (err, rank) => {
-            if (!rank) {
-                console.log('rank not found: ' + req.body.rank);
-                res.status(401).json({ error: "Rank not found", rankNotFound: true });
+        MinecraftUser.findOne({ nameLower: req.params.name.toLowerCase() }, (err, user) => {
+            if (!user) {
+                console.log('player not found: ' + req.params.name);
+                res.status(401).json({ message: "Player not found", error: true });
                 return;
             }
-
-            MinecraftUser.findOne({ nameLower: req.params.name.toLowerCase() }, (err, user) => {
-                if (!user) {
-                    console.log('player not found: ' + req.params.name);
-                    res.status(401).json({ error: "Player not found", userNotFound: true });
-                    return;
-                }
-
+            if (req.body.rankId) {
+                let rankId = new mongoose.Types.ObjectId(req.body.rankId);
                 //user already has rank
                 if (user.ranks && user.ranks.indexOf(rankId) > -1) {
-                    res.json({});
+                    res.status(401).json({ message: "User already has the specified rank", error: true });
                     return;
                 }
 
-                MinecraftUser.update({ _id: user._id }, {
-                    $addToSet: { ranks: rank._id }
-                }, (err) => {
-                    console.log('Added rank ' + rank.prefix + ' to ' + user.name + '\'s profile.');
-                    res.json({});
-                    return;
-                })
-            })
-        })
-    })
+                MinecraftRank.findOne({ _id: rankId }, (err, rank) => {
+                    if (!rank) {
+                        console.log('rank not found: ' + req.body.rankId);
+                        res.status(401).json({ message: "Rank not found", error: true });
+                        return;
+                    }
+
+                    MinecraftUser.update({ _id: user._id }, {
+                        $addToSet: { ranks: rank._id }
+                    }, (err) => {
+                        console.log('Added rank ' + rank.prefix + ' to ' + user.name + '\'s profile.');
+                        res.json({rank: rank});
+                        return;
+                    });
+                });
+            } else if (req.body.rankName) {
+                               
+                let rankName = req.body.rankName;
+                MinecraftRank.findOne({ name: rankName }, (err, rank) => {
+                    if (!rank) {
+                        console.log('rank not found: ' + rankName);
+                        res.status(401).json({ message: "Rank not found", error: true });
+                        return;
+                    }
+
+                    //user already has rank
+                    if (user.ranks && user.ranks.indexOf(rank._id) > -1) {
+                        res.status(401).json({ message: "User already has the specified rank", error: true });
+                        return;
+                    }
+
+                    console.log(rank);
+
+                    MinecraftUser.update({ _id: user._id }, {
+                        $addToSet: { ranks: rank._id }
+                    }, (err) => {
+                        console.log(user._id + ": " + rank._id)
+                        console.log('Added rank ' + rank.prefix + ' to ' + user.name + '\'s profile.');
+                        res.json({rank: rank});
+                        return;
+                    });
+                });
+            }
+        });
+    });
 
     /**
      * Removes a rank from a user's profile
