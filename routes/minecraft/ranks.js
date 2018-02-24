@@ -32,7 +32,7 @@ module.exports = function (app) {
             return;
         }
         var rank = new MinecraftRank({
-            name: req.body.name,
+            name: req.body.name.toLowerCase(),
             priority: req.body.priority,
             prefix: req.body.prefix,
             permissions: req.body.permissions,
@@ -65,7 +65,7 @@ module.exports = function (app) {
             });
             
         } else if (req.body.name) {
-            MinecraftRank.findOne({name: req.body.name}, (err, rank) => {
+            MinecraftRank.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
                 if (!rank) {
                     res.json({message: "Rank not found", error: true});
                     return;
@@ -104,7 +104,7 @@ module.exports = function (app) {
             });
             
         } else if (req.body.name) {
-            MinecraftRank.findOne({name: req.body.name}, (err, rank) => {
+            MinecraftRank.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
                 if (!rank) {
                     res.json({message: "Rank not found", error: true});
                     return;
@@ -117,7 +117,7 @@ module.exports = function (app) {
 
                 console.log(update);
 
-                MinecraftRank.update({name: req.body.name}, {$set: update}, (err) => {
+                MinecraftRank.update({name: req.body.name.toLowerCase()}, {$set: update}, (err) => {
                     for (i in update) {
                         rank[i] = update[i];
                     }
@@ -157,7 +157,7 @@ module.exports = function (app) {
             });
             
         } else if (req.body.name) {
-            MinecraftRank.findOne({name: req.body.name}, (err, rank) => {
+            MinecraftRank.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
                 if (!rank) {
                     res.json({message: "Rank not found", error: true});
                     return;
@@ -169,7 +169,7 @@ module.exports = function (app) {
                         permissions.push(permission);
                     }
                 }
-                MinecraftRank.update({name: req.body.name}, {$set: {permissions: permissions}}, (err) => {
+                MinecraftRank.update({name: req.body.name.toLowerCase()}, {$set: {permissions: permissions}}, (err) => {
                     
                     console.log("Added permissions to rank " + rank.name + ": " + req.body.permissions);
                     res.json({rank: rank});
@@ -206,7 +206,7 @@ module.exports = function (app) {
             });
             
         } else if (req.body.name) {
-            MinecraftRank.findOne({name: req.body.name}, (err, rank) => {
+            MinecraftRank.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
                 if (!rank) {
                     res.json({message: "Rank not found", error: true});
                     return;
@@ -217,7 +217,7 @@ module.exports = function (app) {
                         rank.permissions.splice(rank.permissions.indexOf(permission), 1);
                     }
                 }
-                MinecraftRank.update({name: req.body.name}, {$set: {permissions: rank.permissions}}, (err) => {
+                MinecraftRank.update({name: req.body.name.toLowerCase()}, {$set: {permissions: rank.permissions}}, (err) => {
                     
                     console.log("Removed permissions from rank " + rank.name + ": " + req.body.permissions);
                     res.json({rank: rank});
@@ -270,7 +270,7 @@ module.exports = function (app) {
                 });
             } else if (req.body.rankName) {
                                
-                let rankName = req.body.rankName;
+                let rankName = req.body.rankName.toLowerCase();
                 MinecraftRank.findOne({ name: rankName }, (err, rank) => {
                     if (!rank) {
                         console.log('rank not found: ' + rankName);
@@ -348,7 +348,7 @@ module.exports = function (app) {
                     })
                 })
             } else if (req.body.rankName) {
-                let rankName = req.body.rankName;
+                let rankName = req.body.rankName.toLowerCase();
                 MinecraftRank.findOne({ name: rankName }, (err, rank) => {
                     if (!rank) {
                         console.log('rank not found: ' + rankName);
