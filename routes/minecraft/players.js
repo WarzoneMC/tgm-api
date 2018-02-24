@@ -1,10 +1,11 @@
-var mongoose = require("mongoose");
-var verifyServer = require('./verifyServer');
-var async = require('async');
+let mongoose = require("mongoose");
+let verifyServer = require('./verifyServer');
+let async = require('async');
 
-var MinecraftUser = mongoose.model('minecraft_user');
-var MinecraftDeath = mongoose.model('minecraft_death');
-var MinecraftMatch = mongoose.model('minecraft_match');
+let MinecraftUser = mongoose.model('minecraft_user');
+let MinecraftDeath = mongoose.model('minecraft_death');
+let MinecraftMatch = mongoose.model('minecraft_match');
+let MinecraftRank = mongoose.model('minecraft_rank');
 
 var MinecraftPunishment = mongoose.model('minecraft_punishment');
 
@@ -18,8 +19,8 @@ module.exports = function(app) {
                 res.json({error: true});
             }
             if(user) {
-                var deaths = new Array();
-                var matches = new Array();
+                let deaths = new Array();
+                let matches = new Array();
 
                 async.series([
                     function(callback) {
@@ -33,7 +34,7 @@ module.exports = function(app) {
                                     if(err) {
                                         console.log(err);
                                     }
-                                    var containing = new Array();
+                                    let containing = new Array();
                                     async.eachSeries(foundDeaths, function(death, next) {
                                         containing.push(death.player);
                                         if(death.killer) {
@@ -105,7 +106,7 @@ module.exports = function(app) {
                 if(err) {
                     console.log(err);
                 }
-                var containing = new Array();
+                let containing = new Array();
                 async.eachSeries(foundDeaths, function(death, next) {
                     containing.push(death.player);
                     if(death.killer) {
@@ -140,7 +141,7 @@ module.exports = function(app) {
         console.log('login request');
         MinecraftUser.findOne({
             uuid: req.body.uuid
-        }, function(err, user) {
+        }).lean().exec(function(err, user) {
             if(err) throw err;
             console.log('body: ' + JSON.stringify(req.body, null, 2));
 
@@ -185,12 +186,17 @@ module.exports = function(app) {
                             }
                         }
                         user.punishments = punishments;
-                        res.json(user);
-                        console.log('user: ' + JSON.stringify(user, null, 2));
-                        console.log('Minecraft User login: ' + user.name);
+                        MinecraftRank.find({ _id: { $in: user.ranks } }, (err, ranks) => {
+                            if (err) console.log(err);
+                            user.ranksLoaded = ranks;
+                            res.json(user);
+                            console.log('user: ' + JSON.stringify(user, null, 2));
+                            console.log('Minecraft User login: ' + user.name);
+                        });
                     });
                 });
             } else {
+
                 user = new MinecraftUser({
                     name: req.body.name,
                     nameLower: req.body.name.toLowerCase(),
