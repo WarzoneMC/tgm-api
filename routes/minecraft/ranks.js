@@ -238,8 +238,13 @@ module.exports = function (app) {
             res.status(401).json({ message: "Rank not included in request.", error: true });
             return;
         }
-
-        MinecraftUser.findOne({ nameLower: req.params.name.toLowerCase() }, (err, user) => {
+        var filter = {};
+        if (req.params.name.length >= 36) {
+            filter = { uuid: req.params.name };
+        } else {
+            filter = { nameLower: req.params.name.toLowerCase() };
+        }
+        MinecraftUser.findOne(filter, (err, user) => {
             if (!user) {
                 console.log('player not found: ' + req.params.name);
                 res.status(401).json({ message: "Player not found", error: true });
@@ -312,7 +317,14 @@ module.exports = function (app) {
             return;
         }
 
-        MinecraftUser.findOne({ nameLower: req.params.name.toLowerCase() }, (err, user) => {
+        var filter = {};
+        if (req.params.name.length >= 36) {
+            filter = { uuid: req.params.name };
+        } else {
+            filter = { nameLower: req.params.name.toLowerCase() };
+        }
+
+        MinecraftUser.findOne(filter, (err, user) => {
             if (!user) {
                 console.log('player not found: ' + req.params.name);
                 res.status(401).json({ message: "Player not found", error: true });
