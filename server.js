@@ -30,6 +30,7 @@ require('./routes/minecraft/leaderboards')(app);
 require('./routes/minecraft/matches')(app);
 require('./routes/minecraft/deaths')(app);
 require('./routes/minecraft/ranks')(app);
+require('./routes/minecraft/punishments')(app);
 
 const port = config.port;
 

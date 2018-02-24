@@ -7,10 +7,13 @@ let MinecraftDeath = mongoose.model('minecraft_death');
 let MinecraftMatch = mongoose.model('minecraft_match');
 let MinecraftRank = mongoose.model('minecraft_rank');
 
+var MinecraftPunishment = mongoose.model('minecraft_punishment');
+
 module.exports = function(app) {
 
     app.get('/mc/player/:name', function(req, res, next) {
-        MinecraftUser.findOne({nameLower: req.params.name.toLowerCase()}, function(err, user) {
+        MinecraftUser.find({nameLower: req.params.name.toLowerCase()}).sort("-lastOnlineDate").limit(1).exec(function(err, users) {
+            var user = users[0];
             if(err) {
                 console.log(err);
                 res.json({error: true});
@@ -93,6 +96,7 @@ module.exports = function(app) {
         });
     });
 
+    //Not being used
     app.get('/mc/player/deaths', function(req, res) {
         MinecraftDeath
             .find({})
@@ -142,27 +146,55 @@ module.exports = function(app) {
             console.log('body: ' + JSON.stringify(req.body, null, 2));
 
             if(user) {
-                let ips = user.ips;
-                if(ips.indexOf(req.body.ip) < 0) {
+                var ips = user.ips;
+                if (req.body.ip) {
+                    if(ips.indexOf(req.body.ip) >= 0) {
+                        ips.splice(ips.indexOf(req.body.ip), 1);
+                    }
                     ips.push(req.body.ip);
                 }
-
-                MinecraftRank.find({ _id: { $in: user.ranks } }, (err, ranks) => {
+                MinecraftUser.update({uuid: req.body.uuid}, {$set: {
+                    name: req.body.name,
+                    nameLower: req.body.name.toLowerCase(),
+                    lastOnlineDate: new Date().getTime(),
+                    ips: ips
+                }}, function(err) {
                     if (err) console.log(err);
-                    user.ranksLoaded = ranks;
-                    MinecraftUser.update({ uuid: req.body.uuid }, {
-                        $set: {
-                            name: req.body.name,
-                            nameLower: req.body.name.toLowerCase(),
-                            lastOnlineDate: new Date().getTime(),
-                            ips: ips
+                    MinecraftPunishment.find(
+                        {
+                            $or: [
+                                {
+                                    punished: user._id,
+                                    reverted: false
+                                }, {
+                                    ip: req.body.ip,
+                                    ip_ban: true,
+                                    reverted: false
+                                }
+                            ]
+                        }).sort('+issued').exec(function (err, punishes) {
+                        if (err) console.log(err);
+                        var punishments = new Array();
+                        for (var i in punishes) {
+                            var punishment = punishes[i];
+                            if (punishment) {
+                                punishments = punishments.filter(function(p){
+                                    return p.type !== punishment.type;
+                                });
+                                punishments.push(punishment);
+                                if (!punishment.isActive()) punishments.pop();
+                            }
                         }
-                    }, function (err) {
-                        res.json(user);
-                        console.log('user: ' + JSON.stringify(user, null, 2));
-                        console.log('Minecraft User login: ' + user.name);
+                        user.punishments = punishments;
+                        MinecraftRank.find({ _id: { $in: user.ranks } }, (err, ranks) => {
+                            if (err) console.log(err);
+                            user.ranksLoaded = ranks;
+                            res.json(user);
+                            console.log('user: ' + JSON.stringify(user, null, 2));
+                            console.log('Minecraft User login: ' + user.name);
+                        });
                     });
-                })
+                });
             } else {
 
                 user = new MinecraftUser({
@@ -180,8 +212,22 @@ module.exports = function(app) {
                     if(err) {
                         console.log(err);
                     }
-                    res.json(user);
-                    console.log('Registered new minecraft user: ' + user.name);
+                    MinecraftPunishment.find({ip: req.body.ip, ip_ban: true}).sort('+issued').exec(function (err, punishes) {
+                        var punishments = new Array();
+                        for (var i in punishes) {
+                            var punishment = punishes[i];
+                            if (punishment) {
+                                punishments = punishments.filter(function(p){
+                                    return p.type !== punishment.type;
+                                });
+                                punishments.push(punishment);
+                                if (!punishment.isActive()) punishments.pop();
+                            }
+                        }
+                        user.punishments = punishments;
+                        res.json(user);
+                        console.log('Registered new minecraft user: ' + user.name);
+                    });
                 })
             }
         });

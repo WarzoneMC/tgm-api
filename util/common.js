@@ -24,7 +24,7 @@ exports.encrypt = function(password) {
 };
 
 exports.sendMailVerificationLink = function(user, token) {
-    var textLink = "http://team.gg/verify/" + token;
+    var textLink = "http://warz.one/verify/" + token;
     var from = config.email.accountName+" Team<" + config.email.username + ">";
     var mailbody = "<p>Thanks for Registering on " + config.email.accountName + " </p><p>Please verify your email by clicking on the verification link below.<br/><a href=" + textLink.toString()
         + ">Verification Link</a></p>";

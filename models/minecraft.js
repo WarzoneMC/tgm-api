@@ -3,16 +3,51 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
-let MinecraftUser = new Schema({
+var MinecraftPunishment = new Schema({
+    punisher: ObjectId,
+    punished: ObjectId,
+
+    ip: String,
+    ip_ban: Boolean, 
+
+    type: String,
+    
+    issued: Number,
+    expires: Number,
+    reason: String,
+    reverted: Boolean
+});
+
+MinecraftPunishment.methods.isActive = function() {
+    if (this.reverted == true) {
+        return false;
+    } else {
+        if (this.expires == -1) {
+            return true;
+        } else {
+            return this.expires > new Date().getTime()
+        }
+    }
+};
+
+MinecraftPunishment.methods.shouldKick = function() {
+    return this.type.toLowerCase() === 'ban' || this.type.toLowerCase() === 'kick';
+};
+
+mongoose.model('minecraft_punishment', MinecraftPunishment);
+
+var MinecraftUser = new Schema({
     name                    : String,
-    nameLower              : String,
+    nameLower               : String,
     uuid                    : String,
 
-    initialJoinDate       : Number,
-    lastOnlineDate        : Number,
+    initialJoinDate         : Number,
+    lastOnlineDate          : Number,
 
     ranks                   : [ObjectId],
     ips                     : [String],
+
+
 
     kills                   : Number,
     deaths                  : Number,
@@ -20,7 +55,8 @@ let MinecraftUser = new Schema({
     losses                  : Number,
     matches                 : [ObjectId],
     
-    wool_destroys           : Number
+    wool_destroys           : Number,
+    punishments             : [MinecraftPunishment]
 });
 MinecraftUser.methods.toJSON = function() {
     let obj = this.toObject();
@@ -46,18 +82,20 @@ let MinecraftRank = new Schema({
 });
 mongoose.model('minecraft_rank', MinecraftRank);
 
-let MinecraftServer = new Schema({
-    name               : String,
-    nameLower         : String,
-    id                 : String,
+var MinecraftServer = new Schema({
+    name                : String,
+    nameLower           : String,
+    id                  : String,
 
-    lastOnlineDate        : Number,
-    players            : [ObjectId],
-    playerCount       : Number,
-    spectatorCount    : Number,
-    maxPlayers        : Number,
-    map                : String,
-    gametype           : String
+    lastOnlineDate      : Number,
+    players             : [ObjectId],
+    playerNames         : [String],
+
+    playerCount         : Number,
+    spectatorCount      : Number,
+    maxPlayers          : Number,
+    map                 : String,
+    gametype            : String
 });
 mongoose.model('minecraft_server', MinecraftServer);
 
