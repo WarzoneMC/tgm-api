@@ -7,8 +7,8 @@ let MinecraftRank = mongoose.model('minecraft_rank');
 
 module.exports = function (app) {
 
-    app.get('/mc/ranks', verifyServer, (req, res) => {
-        MinecraftRank.find({}, (err, ranks) => {
+    app.get('/mc/ranks', (req, res) => {
+        MinecraftRank.find({}).sort('priority').exec((err, ranks) => {
             res.json(ranks);
         })
     });
@@ -72,6 +72,154 @@ module.exports = function (app) {
                 }
                 MinecraftRank.remove({name: req.body.name}, (err, obj) => {
                     console.log("Deleted rank " + rank.name);
+                    res.json({rank: rank});
+                });
+            });
+        }
+    });
+
+    app.post('/mc/rank/set/:field', verifyServer, (req, res) => {
+        if (!req.body.name && !req.body._id && req.body.value) {
+            res.status(401).json({ message: "Rank not included in request.", error: true });
+            return;
+        }
+        if (req.body._id) {
+            MinecraftRank.findOne({_id: req.body._id}, (err, rank) => {
+                if (!rank) {
+                    res.json({message: "Rank not found", error: true});
+                    return;
+                }
+                var update = {};
+                if (req.params.field == "prefix") update.prefix = req.body.value;
+                if (req.params.field == "priority") update.priority = req.body.value;
+                if (req.params.field == "permissions") update.permissions = req.body.value;
+                if (req.params.field == "staff") update.staff = req.body.value;
+
+                console.log(update);
+                
+                MinecraftRank.findOneAndUpdate({_id: req.body._id}, {$set: update}, {}, (err, newRank) => {
+                    console.log("Edited rank " + newRank.name);
+                    res.json({rank: newRank});
+                });
+            });
+            
+        } else if (req.body.name) {
+            MinecraftRank.findOne({name: req.body.name}, (err, rank) => {
+                if (!rank) {
+                    res.json({message: "Rank not found", error: true});
+                    return;
+                }
+                var update = {};
+                if (req.params.field == "prefix") update.prefix = req.body.value;
+                if (req.params.field == "priority") update.priority = req.body.value;
+                if (req.params.field == "permissions") update.permissions = req.body.value;
+                if (req.params.field == "staff") update.staff = req.body.value;
+
+                console.log(update);
+
+                MinecraftRank.update({name: req.body.name}, {$set: update}, (err) => {
+                    for (i in update) {
+                        rank[i] = update[i];
+                    }
+                    console.log("Edited rank " + rank.name);
+                    res.json({rank: rank});
+                });
+            });
+        }
+    });
+
+    app.post('/mc/rank/permissions/add', verifyServer, (req, res) => {
+        if (!req.body.name && !req.body._id) {
+            res.status(401).json({ message: "Rank not included in request.", error: true });
+            return;
+        }
+        if (!req.body.permissions || !(req.body.permissions instanceof Array)) {
+            res.status(401).json({ message: "Rank permissions not specified.", error: true });
+            return;
+        }
+        if (req.body._id) {
+            MinecraftRank.findOne({_id: req.body._id}, (err, rank) => {
+                if (!rank) {
+                    res.json({message: "Rank not found", error: true});
+                    return;
+                }
+                var permissions = (rank.permissions ? rank.permissions : new Array());
+                for (var i in req.body.permissions) {
+                    var permission = req.body.permissions[i];
+                    if (permissions.indexOf(permission) <= -1) {
+                        permissions.push(permission);
+                    }
+                }
+                MinecraftRank.update({name: req.body._id}, {$set: {permissions: permissions}}, (err) => {
+                    console.log("Added permissions to rank " + rank.name + ": " + req.body.permissions);
+                    res.json({rank: rank});
+                });
+            });
+            
+        } else if (req.body.name) {
+            MinecraftRank.findOne({name: req.body.name}, (err, rank) => {
+                if (!rank) {
+                    res.json({message: "Rank not found", error: true});
+                    return;
+                }
+                var permissions = (rank.permissions ? rank.permissions : new Array());
+                for (var i in req.body.permissions) {
+                    var permission = req.body.permissions[i];
+                    if (permissions.indexOf(permission) <= -1) {
+                        permissions.push(permission);
+                    }
+                }
+                MinecraftRank.update({name: req.body.name}, {$set: {permissions: permissions}}, (err) => {
+                    
+                    console.log("Added permissions to rank " + rank.name + ": " + req.body.permissions);
+                    res.json({rank: rank});
+                });
+            });
+        }
+    });
+
+    app.post('/mc/rank/permissions/remove', verifyServer, (req, res) => {
+        if (!req.body.name && !req.body._id) {
+            res.status(401).json({ message: "Rank not included in request.", error: true });
+            return;
+        }
+        if (!req.body.permissions || !(req.body.permissions instanceof Array)) {
+            res.status(401).json({ message: "Rank permissions not specified.", error: true });
+            return;
+        }
+        if (req.body._id) {
+            MinecraftRank.findOne({_id: req.body._id}, (err, rank) => {
+                if (!rank) {
+                    res.json({message: "Rank not found", error: true});
+                    return;
+                }
+                for (var i in req.body.permissions) {
+                    var permission = req.body.permissions[i];
+                    if (rank.permissions && rank.permissions.indexOf(permission) > -1) {
+                        rank.permissions.splice(i, 1);
+                    }
+                }
+                MinecraftRank.update({name: req.body._id}, {$set: {permissions: rank.permissions}}, (err) => {
+                    console.log("Removed permissions from rank " + rank.name + ": " + req.body.permissions);
+                    res.json({rank: rank});
+                });
+            });
+            
+        } else if (req.body.name) {
+            MinecraftRank.findOne({name: req.body.name}, (err, rank) => {
+                if (!rank) {
+                    res.json({message: "Rank not found", error: true});
+                    return;
+                }
+                for (var i in req.body.permissions) {
+                    var permission = req.body.permissions[i];
+                    if (rank.permissions && rank.permissions.indexOf(permission) > -1) {
+                        rank.permissions.splice(rank.permissions.indexOf(permission), 1);
+                    }
+                }
+                MinecraftRank.update({name: req.body.name}, {$set: {permissions: rank.permissions}}, (err) => {
+                    
+                    console.log("Removed permissions from rank " + rank.name + ": " + req.body.permissions);
                     res.json({rank: rank});
                 });
             });
@@ -220,44 +368,12 @@ module.exports = function (app) {
                         $pull: { ranks: rank._id }
                     }, (err) => {
                         console.log(user._id + ": " + rank._id)
-                        console.log('Added rank ' + rank.name + ' to ' + user.name + '\'s profile.');
+                        console.log('Removed rank ' + rank.name + ' from ' + user.name + '\'s profile.');
                         res.json({rank: rank});
                         return;
                     });
                 });         
             }
         });
-
-
-        let rankId = new mongoose.Types.ObjectId(req.body.rank);
-        MinecraftRank.findOne({ _id: rankId }, (err, rank) => {
-            if (!rank) {
-                console.log('rank not found: ' + req.body.rank);
-                res.status(401).json({ error: "Rank not found", rankNotFound: true });
-                return;
-            }
-
-            MinecraftUser.findOne({ nameLower: req.params.name.toLowerCase() }, (err, user) => {
-                if (!user) {
-                    console.log('player not found: ' + req.params.name);
-                    res.status(401).json({ error: "Player not found", userNotFound: true });
-                    return;
-                }
-
-                //user already doesn't have rank
-                if (user.ranks && user.ranks.indexOf(rankId) <= -1) {
-                    res.json({});
-                    return;
-                }
-
-                MinecraftUser.update({ _id: user._id }, {
-                    $pull: { ranks: rank._id }
-                }, (err) => {
-                    console.log('Removed rank ' + rank.prefix + ' from ' + user.name + '\'s profile.');
-                    res.json({});
-                    return;
-                })
-            })
-        })
     })
 }
