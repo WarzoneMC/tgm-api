@@ -18,7 +18,7 @@ module.exports = function (app) {
             var rank = ranks[0];
             
             if (!rank) {
-                res.status(401).json({ notFound: true });
+                res.status(404).json({ notFound: true });
                 return;
             }
             MinecraftUser.find({ranks: [ rank._id ]}).exec((err, users) => {
