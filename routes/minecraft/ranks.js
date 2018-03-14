@@ -13,7 +13,7 @@ module.exports = function (app) {
         })
     });
     
-    app.get('/mc/players/:rank', (req, res) => {
+    app.get('/mc/rank/:rank/players', (req, res) => {
         MinecraftRank.find({ name: req.params.rank.toLowerCase() }).limit(1).exec((err, ranks) => {
             var rank = ranks[0];
             
