@@ -1,8 +1,5 @@
 var mongoose = require("mongoose");
-var User = mongoose.model('user');
 var MinecraftUser = mongoose.model('minecraft_user');
-var MinecraftDeath = mongoose.model('minecraft_death');
-var verifyServer = require('./verifyServer');
 
 module.exports = function(app) {
 
