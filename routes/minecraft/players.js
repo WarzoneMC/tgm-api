@@ -137,6 +137,43 @@ module.exports = function(app) {
             })
     })
 
+    app.post('/mc/player/lookup', verifyServer, function(req, res) {
+        if (req.body.ip) {
+            MinecraftUser.find({ips: req.body.ip}).exec((err, users) => {
+                if (err) console.log(err);
+                var foundUsers = [];
+                for (var i in users) {
+                    var json = users[i].toFullJSON();
+                    delete json.matches;
+                    foundUsers.push(json);
+                }
+                res.json({
+                    queryFilter: req.body.ip,
+                    users: foundUsers
+                })
+            });
+        } else if (req.body.name) {
+            MinecraftUser.find({nameLower: req.body.name.toLowerCase()}).exec((err, users) => {
+                if (err) console.log(err);
+                var foundUsers = [];
+                for (var i in users) {
+                    var json = users[i].toFullJSON();
+                    delete json.matches;
+                    foundUsers.push(json);
+                }
+                res.json({
+                    queryFilter: req.body.name,
+                    users: foundUsers
+                })
+            });
+        } else {
+            res.json({
+                error: true,
+                message: "Query filter not included in the request."
+            });
+        }
+    });
+
     app.post('/mc/player/login', verifyServer, function(req, res) {
         console.log('login request');
         MinecraftUser.findOne({

@@ -67,6 +67,12 @@ MinecraftUser.methods.toJSON = function() {
     obj.xp = ((obj.wins ? obj.wins : 0) * 10) + ((obj.losses ? obj.losses : 0) * 5) + ((obj.wool_destroys ? obj.wool_destroys : 0) * 3) + ((obj.kills ? obj.kills : 0) * 2);
     return obj;
 };
+
+MinecraftUser.methods.toFullJSON = function() {
+    let obj = this.toObject();
+    return obj;
+};
+
 MinecraftUser.methods.loadRanks = function (callback) {
     MinecraftRank.find({ _id: { $in: this.ranks } }, (err, ranks) => {
         if (err) console.log(err);
