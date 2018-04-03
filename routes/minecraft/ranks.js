@@ -12,6 +12,21 @@ module.exports = function (app) {
             res.json(ranks);
         })
     });
+    
+    app.get('/mc/rank/:rank/players', (req, res) => {
+        MinecraftRank.findOne({ name: req.params.rank.toLowerCase() }, (err, rank) => {
+            if (!rank) {
+                res.status(404).json({ notFound: true });
+                return;
+            }
+            MinecraftUser.find({ranks: rank._id}).exec((err, users) => {
+                res.json({
+                    rank: rank,
+                    users: users
+                });
+            });
+        });
+    });
 
     app.get('/mc/player/:name/ranks', verifyServer, (req, res) => {
         MinecraftUser.find({ nameLower: req.params.name.toLowerCase() }).sort("-lastOnlineDate").limit(1).exec((err, users) => {
