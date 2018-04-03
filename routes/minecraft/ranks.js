@@ -14,15 +14,16 @@ module.exports = function (app) {
     });
     
     app.get('/mc/rank/:rank/players', (req, res) => {
-        MinecraftRank.find({ name: req.params.rank.toLowerCase() }).limit(1).exec((err, ranks) => {
-            var rank = ranks[0];
-            
+        MinecraftRank.findOne({ name: req.params.rank.toLowerCase() }, (err, rank) => {
             if (!rank) {
                 res.status(404).json({ notFound: true });
                 return;
             }
-            MinecraftUser.find({ranks: [ rank._id ]}).exec((err, users) => {
-                res.json(users);
+            MinecraftUser.find({ranks: rank._id}).exec((err, users) => {
+                res.json({
+                    rank: rank,
+                    users: users
+                });
             });
         });
     });
