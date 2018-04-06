@@ -5,9 +5,34 @@ var User = mongoose.model('user');
 var MinecraftUser = mongoose.model('minecraft_user');
 var MinecraftServer = mongoose.model('minecraft_server');
 var MinecraftMap = mongoose.model('minecraft_map');
+var MinecraftMatch = mongoose.model('minecraft_match');
+var MinecraftDeath = mongoose.model('minecraft_death');
+var MinecraftPunishment = mongoose.model('minecraft_punishment');
 var verifyServer = require('./verifyServer');
+var async = require('async');
 
 module.exports = function(app) {
+
+    app.get('/mc/stats', (req, res, next) => {
+        MinecraftUser.count({}, (err, users) => {
+            MinecraftMatch.count({}, (err, matches) => {
+                MinecraftDeath.count({}, (err, deaths) => {
+                    MinecraftMap.count({}, (err, maps) => {
+                        MinecraftPunishment.count({}, (err, punishments) => {
+                            res.json({
+                                users: users,
+                                matches: matches,
+                                deaths: deaths,
+                                maps: maps,
+                                punishments: punishments
+                            });
+                        })
+                    })
+                })
+            })
+        })
+    })
+
     app.post('/mc/server/stats', function(req, res) {
         MinecraftServer.findOne({
             name: req.body.name
