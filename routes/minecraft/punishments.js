@@ -94,7 +94,7 @@ module.exports = function(app) {
                     if (err) console.log(err);
                     var ids = [];
                     ids.push(punishment.punished);
-                    if (punishment.punished.toString() !== punishment.punisher.toString()) ids.push(punishment.punisher);
+                    if (punishment.punisher && punishment.punished.toString() !== punishment.punisher.toString()) ids.push(punishment.punisher);
                     var loadedUsers = [];
                     async.eachSeries(ids, function (id, next) {
                         MinecraftUser.findOne({_id: id}, function (err, user) {
