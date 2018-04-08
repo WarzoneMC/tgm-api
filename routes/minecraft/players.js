@@ -261,8 +261,10 @@ module.exports = function(app) {
                                 if (!punishment.isActive()) punishments.pop();
                             }
                         }
-                        user.punishments = punishments;
-                        res.json(user);
+                        var userJson = user.toJSON();
+                        userJson.punishments = punishments;
+                        userJson.new = true;
+                        res.json(userJson);
                         console.log('Registered new minecraft user: ' + user.name);
                     });
                 })
