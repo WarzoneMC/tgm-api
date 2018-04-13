@@ -130,7 +130,7 @@ module.exports = function(app) {
             MinecraftPunishment.find({ip: req.body.ip}).exec(function(err, punishes) {
                 for (var i in punishes) {
                     var punishment = punishes[i];
-                    if (!ids.includes(punishment.punisher.toString())) {
+                    if (punishment.punisher && !ids.includes(punishment.punisher.toString())) {
                         ids.push(punishment.punisher.toString());
                     }
                     if (punishment.punished && !ids.includes(punishment.punished.toString())) {
