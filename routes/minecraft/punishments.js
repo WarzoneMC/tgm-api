@@ -123,87 +123,58 @@ module.exports = function(app) {
     });
 
     app.post('/mc/player/punishments', verifyServer, function(req, res) {
-        if (req.body.ip) {
+        var result;
+        if (req.body.ip) result = MinecraftUser.find({ips: req.body.ip});
+        else if (req.body.name) result = MinecraftUser.find({nameLower: req.body.name.toLowerCase()}).sort('-lastOnlineDate').limit(1);
+        else {
+            res.json({notFound: true});
+            return;
+        }
+        result.exec(function(err, users) {
+            if (users.length == 0) {
+                res.json({notFound: true});
+                return;
+            }
+            if (err) console.log(err);
+            var loadedPunishments = [];
+            var loadedUsers = {};
             var ids = [];
-            var punishments = [];
-            var loadedUsers = [];
-            MinecraftPunishment.find({ip: req.body.ip}).exec(function(err, punishes) {
-                for (var i in punishes) {
-                    var punishment = punishes[i];
-                    if (punishment.punisher && !ids.includes(punishment.punisher.toString())) {
-                        ids.push(punishment.punisher.toString());
-                    }
-                    if (punishment.punished && !ids.includes(punishment.punished.toString())) {
-                        ids.push(punishment.punished.toString());
-                    }
-                    punishments.push(punishment);
-                }
+            async.eachSeries(users, function (user, next) {
+                MinecraftPunishment.find(req.body.ip ? {punished: user._id, ip: req.body.ip} : {punished: user._id}).exec(function(err, punishments) {
+                    if (err) console.log(err);
+                    for (var i in punishments) {
+                        var punishment = punishments[i];
+                        if (punishment.punisher && !ids.includes(punishment.punisher.toString())) ids.push(punishment.punisher.toString());
+                        if (punishment.punished && !ids.includes(punishment.punished.toString())) ids.push(punishment.punished.toString());
+                        loadedPunishments.push(punishment.toJSON());
+                    }                    
+                    next();
+                });
+            }, function (err){
                 async.eachSeries(ids, function (id, next) {
-                    MinecraftUser.findOne({_id: id}, function(err, user1) {
-                        if (user1) {
-                            loadedUsers.push({
-                                id: user1._id,
-                                name: user1.name
-                            });
+                    MinecraftUser.findOne({_id: id}, function(err, foundUser) {
+                        if (foundUser) {
+                            var finalUser = foundUser.toJSON();
+                            delete finalUser.matches;
+                            loadedUsers[id] = finalUser;
                         }
                         next();
                     });
                 }, function (err){
-                    if (err) console.log(err);
+                    for (var i in loadedPunishments) {
+                        var punishment = loadedPunishments[i];
+                        if (punishment.punisher && loadedUsers[punishment.punisher]) punishment.punisherLoaded = loadedUsers[punishment.punisher];
+                        if (punishment.punished && loadedUsers[punishment.punished]) punishment.punishedLoaded = loadedUsers[punishment.punished];
+                    }
+                    var loadedUsersLegacy = [];
+                    for (var id in loadedUsers) loadedUsersLegacy.push({id: loadedUsers[id]._id, name: loadedUsers[id].name});
                     res.json({
-                        punishments: punishments,
-                        loadedUsers: loadedUsers
+                        punishments: loadedPunishments,
+                        loadedUsers: loadedUsersLegacy
                     });
                 });
             });
-            
-        } else if (req.body.name) {
-            MinecraftUser.find({nameLower: req.body.name.toLowerCase()}).sort('-lastOnlineDate').limit(1).exec(function(err, users){
-                if (err) console.log(err);
-                var user = users[0];
-                if (user) {
-                    MinecraftPunishment.find({punished: user._id}).exec(function(err, punishments) {
-                        if (err) console.log(err);
-                        var ids = [];
-                        async.eachSeries(punishments, function (punishment, next) {
-                            if (punishment.punisher && !ids.includes(punishment.punisher.toString())) {
-                                ids.push(punishment.punisher.toString());
-                            }
-                            if (punishment.punished && !ids.includes(punishment.punished.toString())) {
-                                ids.push(punishment.punished.toString());
-                            }
-                            next();
-                        }, function (err){
-                            var loadedUsers = [];
-                            async.eachSeries(ids, function (id, next) {
-                                MinecraftUser.findOne({_id: id}, function(err, user1) {
-                                if (user1) {
-                                    loadedUsers.push({
-                                        id: user1._id,
-                                        name: user1.name
-                                    });
-                                }
-                                next();
-                            });
-                            }, function (err){
-                                if (err) console.log(err);
-                                user.matches = [];
-                                res.json({
-                                    punishments: punishments,
-                                    loadedUsers: loadedUsers
-                                });
-                            });
-                            
-                        });
-                        
-                    });
-                } else {
-                    res.json({notFound: true});
-                }
-            });
-        } else {
-            res.json({notFound: true});
-        }
+        });
         
     });
 
