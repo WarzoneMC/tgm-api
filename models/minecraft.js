@@ -19,16 +19,22 @@ var MinecraftPunishment = new Schema({
 });
 
 MinecraftPunishment.methods.isActive = function() {
-    if (this.reverted == true) {
+    if (this.reverted) {
         return false;
     } else {
-        if (this.expires == -1) {
+        if (this.expires < 0) {
             return true;
         } else {
-            return this.expires > new Date().getTime()
+            return this.expires > new Date().getTime();
         }
     }
 };
+
+MinecraftPunishment.methods.toJSON = function() {
+    var json = this.toObject();
+    json.active = this.isActive();
+    return json;
+}
 
 MinecraftPunishment.methods.shouldKick = function() {
     return this.type.toLowerCase() === 'ban' || this.type.toLowerCase() === 'kick';
