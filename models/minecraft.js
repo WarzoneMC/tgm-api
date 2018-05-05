@@ -22,7 +22,7 @@ MinecraftPunishment.methods.isActive = function() {
     if (this.reverted) {
         return false;
     } else {
-        if (this.expires < 0) {
+        if (this.expires == -1) {
             return true;
         } else {
             return this.expires > new Date().getTime();
