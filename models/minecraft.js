@@ -57,13 +57,10 @@ const MinecraftUser = new Schema({
     ranks                   : [ObjectId],
     ips                     : [String],
 
-
-
     kills                   : Number,
     deaths                  : Number,
     wins                    : Number,
     losses                  : Number,
-    matches                 : [ObjectId],
     
     wool_destroys           : Number,
     punishments             : [MinecraftPunishment]
@@ -166,9 +163,9 @@ const MinecraftMatch = new Schema({
         matchTime: Number,
         teamChat: Boolean
     }],
-    deaths: [ObjectId],
     winners: [ObjectId],
     losers: [ObjectId],
+    participants: [ObjectId],
     winningTeam: String,
     teamMappings: [{
         team: String,
@@ -177,3 +174,15 @@ const MinecraftMatch = new Schema({
     finished: Boolean
 });
 export const MinecraftMatchModel = mongoose.model('minecraft_match', MinecraftMatch);
+
+const MinecraftMatchChat = new Schema({
+    match: ObjectId,
+    user: ObjectId,
+    username: String,
+    uuid: String,
+    message: String,
+    team: String,
+    matchTime: Number,
+    teamChat: Boolean
+});
+export const MinecraftMatchChatModel = mongoose.model('minecraft_match_chat', MinecraftMatchChat);

@@ -5,7 +5,7 @@ var async = require('async');
 import { MinecraftUserModel, MinecraftMatchModel, MinecraftMapModel, MinecraftDeathModel } from "../../models/minecraft";
 import express from 'express';
 const router = express.Router();
-    
+
 /**
  * Increments user's wool break count by 1.
  *
@@ -20,14 +20,14 @@ router.post('/mc/match/destroy_wool', verifyServer, (req, res) => {
 /**
  * body: MatchLoadRequest.java
  */
-router.post('/mc/match/load', verifyServer, function(req, res) {
+router.post('/mc/match/load', verifyServer, function (req, res) {
     var match = new MinecraftMatchModel({
         initializedDate: new Date().getTime(),
         finished: false,
         map: mongoose.Types.ObjectId(req.body.map)
     });
-    match.save(function(err) {
-        if(err) console.log(err);
+    match.save(function (err) {
+        if (err) console.log(err);
 
         console.log('created new match: ' + match._id);
         res.json(match);
@@ -35,81 +35,68 @@ router.post('/mc/match/load', verifyServer, function(req, res) {
 });
 
 /**
- * body: MatchInProgress.java
+ * body: MatchFinishPacket.java
  */
-router.post('/mc/match/finish', verifyServer, function(req, res) {
-    console.log('match body: ' + JSON.stringify(req.body, null, 2));
-    return res.json({});
+router.post('/mc/match/finish', verifyServer, async (req, res) => {
+    console.log('match finish body:', req.body);
 
-    var allUserIds = new Array();
-    async.eachSeries(req.body.chat, function(chat, next) {
-        chat.user = mongoose.Types.ObjectId(chat.user);
-        next();
-    }, function(err) {
-        var fixedDeaths = new Array();
-        async.eachSeries(req.body.deaths, function(death, next) {
-            fixedDeaths.push(mongoose.Types.ObjectId(death));
-            next();
-        }, function(err) {
-            var fixedWinners = new Array();
-            async.eachSeries(req.body.winners, function(winner, next) {
-                fixedWinners.push(mongoose.Types.ObjectId(winner));
-                allUserIds.push(winner);
-                next();
-            }, function(err) {
-                var fixedLosers = new Array();
-                async.eachSeries(req.body.losers, function(loser, next) {
-                    fixedLosers.push(mongoose.Types.ObjectId(loser));
-                    allUserIds.push(loser);
-                    next();
-                }, function(err) {
-                    MinecraftMatchModel.update({_id: mongoose.Types.ObjectId(req.body.id)}, {$set: {
-                        map: mongoose.Types.ObjectId(req.body.map),
-                        startedDate: req.body.startedDate,
-                        finishedDate: req.body.finishedDate,
-                        chat: req.body.chat,
-                        deaths: fixedDeaths,
-                        winners: fixedWinners,
-                        losers: fixedLosers,
-                        teamMappings: req.body.teamMappings,
-                        winningTeam: req.body.winningTeam
-                    }}, function(err) {
-                        if(err) {
-                            console.log(err);
-                        }
-                        res.json({})
-                    });
+    for(let chat of req.body.chat) {
+        chat.user = new mongoose.Types.ObjectId(chat.user);
+    }
 
-                    MinecraftUserModel.update({_id: {$in: fixedWinners}}, {$inc: {wins: 1}}, {multi: true}, function(err) {
-                        if(err) console.log(err);
-                        MinecraftUserModel.update({_id: {$in: fixedLosers}}, {$inc: {losses: 1}}, {multi: true}, function(err) {
-                            if(err) console.log(err);
+    const deaths = [];
+    for(let death of req.body.deaths) {
+        deaths.push(new mongoose.Types.ObjectId(death));
+    }
+    
+    const allUserids = [];
+    const winners = [];
+    for(let winner of req.body.deaths) {
+        winners.push(new mongoose.Types.ObjectId(winner));
+        allUserIds.push(new mongoose.Types.ObjectId(winner));
+    }
 
-                            MinecraftUserModel.update({_id: {$in: allUserIds}},
-                                {$addToSet: {matches: mongoose.Types.ObjectId(req.body.id)}}, {multi: true}, function(err) {
-                                if(err) console.log(err);
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    });
+    const losers = [];
+    for(let loser of req.body.winners) {
+        losers.push(new mongoose.Types.ObjectId(loser));
+        allUserIds.push(new mongoose.Types.ObjectId(loser));
+    }
+
+    await MinecraftMatchModel.findByIdAndUpdate(req.body.id, {
+        $set: {
+            map: new mongoose.Types.ObjectId(req.body.map),
+            startedDate: req.body.startedDate,
+            finishedDate: req.body.finishedDate,
+            chat: chat,
+            deaths: deaths,
+            winners: winners,
+            losers: loser,
+            teamMappings: req.body.teamMappings,
+            winningTeam: req.body.winningTeam,
+            participants: allUserids
+        }
+    }).exec();
+
+    await MinecraftUserModel.updateMany({_id: { $in: winners }}, {$inc: { wins: 1}}).exec();
+    await MinecraftUserModel.updateMany({_id: { $in: losers }}, {$inc: { losses: 1}}).exec();
+    await MinecraftUserModel.updateMany({_id: { $in: allUserIds}}, {$addToSet: { matches: mongoose.Types.ObjectId(req.body.id) }}).exec();
+
+    res.json({});
 });
 
-router.get('/mc/match/latest/:playerName', function(req, res, next) {
-    MinecraftUserModel.findOne({nameLower: req.params.playerName.toLowerCase()}, function(err, user) {
+router.get('/mc/match/latest/:playerName', function (req, res, next) {
+    MinecraftUserModel.findOne({ nameLower: req.params.playerName.toLowerCase() }, function (err, user) {
         MinecraftMatchModel
-            .find({_id: {$in: user.matches}})
+            .find({ _id: { $in: user.matches } })
             .limit(5)
             .sort("-finishedDate")
-            .exec(function(err, matches) {
+            .exec(function (err, matches) {
                 var recentMatches = new Array();
-                async.eachSeries(matches, function(match, next) {
+                async.eachSeries(matches, function (match, next) {
                     async.series([
                         //load map
-                        function(callback) {
-                            MinecraftMapModel.findOne({_id: match.map}, function(err, map) {
+                        function (callback) {
+                            MinecraftMapModel.findOne({ _id: match.map }, function (err, map) {
                                 recentMatches.push({
                                     match: match,
                                     loadedMap: map,
@@ -120,28 +107,28 @@ router.get('/mc/match/latest/:playerName', function(req, res, next) {
                                 callback();
                             })
                         }
-                    ], function(err) {
+                    ], function (err) {
                         next();
                     })
-                }, function(err) {
+                }, function (err) {
                     res.json(recentMatches);
                 })
             })
     })
 });
 
-router.get('/mc/match/latest', function(req, res, next) {
+router.get('/mc/match/latest', function (req, res, next) {
     MinecraftMatchModel
         .find({})
         .limit(4)
         .sort("-finishedDate")
-        .exec(function(err, matches) {
+        .exec(function (err, matches) {
             var recentMatches = new Array();
-            async.eachSeries(matches, function(match, next) {
+            async.eachSeries(matches, function (match, next) {
                 async.series([
                     //load map
-                    function(callback) {
-                        MinecraftMap.findOne({_id: match.map}, function(err, map) {
+                    function (callback) {
+                        MinecraftMap.findOne({ _id: match.map }, function (err, map) {
                             recentMatches.push({
                                 match: match,
                                 loadedMap: map,
@@ -152,19 +139,19 @@ router.get('/mc/match/latest', function(req, res, next) {
                             callback();
                         })
                     }
-                ], function(err) {
+                ], function (err) {
                     next();
                 })
-            }, function(err) {
+            }, function (err) {
                 res.json(recentMatches);
             })
         })
 });
 
-router.get('/mc/match/:id', function(req, res, next) {
-    MinecraftMatchModel.findOne({_id: mongoose.Types.ObjectId(req.params.id)}, function(err, match) {
+router.get('/mc/match/:id', function (req, res, next) {
+    MinecraftMatchModel.findOne({ _id: mongoose.Types.ObjectId(req.params.id) }, function (err, match) {
 
-        if(match) {
+        if (match) {
             var combinedIds = new Array();
             var usersCombined = new Array();
 
@@ -178,9 +165,9 @@ router.get('/mc/match/:id', function(req, res, next) {
             async.series([
 
                 //load map
-                function(callback) {
-                    MinecraftMapModel.findOne({_id: match.map}, function(err, map) {
-                        if(err) console.log(err);
+                function (callback) {
+                    MinecraftMapModel.findOne({ _id: match.map }, function (err, map) {
+                        if (err) console.log(err);
 
                         mapLoaded = map;
                         console.log('map name: ' + map.name);
@@ -189,77 +176,77 @@ router.get('/mc/match/:id', function(req, res, next) {
                 },
 
                 //group winner and loser player objects so we only query once.
-                function(callback) {
-                    async.eachSeries(match.winners, function(winner, next) {
+                function (callback) {
+                    async.eachSeries(match.winners, function (winner, next) {
                         combinedIds.push(winner);
                         next();
-                    }, function(err) {
+                    }, function (err) {
                         callback();
                     })
                 },
-                function(callback) {
-                    async.eachSeries(match.losers, function(loser, next) {
+                function (callback) {
+                    async.eachSeries(match.losers, function (loser, next) {
                         combinedIds.push(loser);
                         next();
-                    }, function(err) {
+                    }, function (err) {
                         callback();
                     })
                 },
 
                 //load winner and loser player objects.
-                function(callback) {
-                    MinecraftUserModel.find({_id: {$in: combinedIds}}, function(err, users) {
-                        if(err) console.log(err);
+                function (callback) {
+                    MinecraftUserModel.find({ _id: { $in: combinedIds } }, function (err, users) {
+                        if (err) console.log(err);
 
                         async.series([
-                            function(callback) {
-                                async.eachSeries(match.winners, function(winner, next) {
-                                    Common.matchPlayerWithId(users, winner, function(player) {
+                            function (callback) {
+                                async.eachSeries(match.winners, function (winner, next) {
+                                    Common.matchPlayerWithId(users, winner, function (player) {
                                         winnersLoaded.push(player);
                                         usersCombined.push(player);
                                         next();
                                     })
-                                }, function(err) {
+                                }, function (err) {
                                     callback();
                                 })
                             },
-                            function(callback) {
-                                async.eachSeries(match.losers, function(loser, next) {
-                                    Common.matchPlayerWithId(users, loser, function(player) {
+                            function (callback) {
+                                async.eachSeries(match.losers, function (loser, next) {
+                                    Common.matchPlayerWithId(users, loser, function (player) {
                                         losersLoaded.push(player);
                                         usersCombined.push(player);
                                         next();
                                     })
-                                }, function(err) {
+                                }, function (err) {
                                     callback();
                                 })
                             }
-                        ], function(err) {
+                        ], function (err) {
                             callback();
                         })
                     })
                 },
 
                 //Load deaths for the match and calculate each player's stats (kdr)
-                function(callback) {
-                    MinecraftDeathModel.find({match: match._id}, function(err, deaths) {
-                        if(err) console.log(err);
+                function (callback) {
+                    MinecraftDeathModel.find({ match: match._id }, function (err, deaths) {
+                        if (err) console.log(err);
 
                         console.log('found ' + deaths.length + ' deaths.');
 
-                        async.eachSeries(deaths, function(death, next) {
+                        async.eachSeries(deaths, function (death, next) {
 
-                            Common.matchPlayerWithId(usersCombined, death.player, function(found) {
+                            Common.matchPlayerWithId(usersCombined, death.player, function (found) {
                                 death.playerLoaded = found;
 
-                                Common.matchPlayerWithId(usersCombined, death.killer, function(found) {
+                                Common.matchPlayerWithId(usersCombined, death.killer, function (found) {
                                     death.killerLoaded = found;
                                     next();
                                 })
                             });
-                        }, function(err) {
+                        }, function (err) {
                             var deathsCache = new Array();
-                            async.eachSeries(usersCombined, function(user, next) {
+                            async.eachSeries(usersCombined, function (user, next) {
 
                                 var playerStat = {
                                     name: user.name,
@@ -270,26 +257,26 @@ router.get('/mc/match/:id', function(req, res, next) {
                                     kdr: 0
                                 };
 
-                                async.eachSeries(deaths, function(death, next) {
-                                    if(death.player.toString() == user._id.toString()) {
+                                async.eachSeries(deaths, function (death, next) {
+                                    if (death.player.toString() == user._id.toString()) {
                                         playerStat.deaths = playerStat.deaths + 1;
                                     }
                                     else if (death.killer != null && death.killer.toString() == user._id.toString()) {
                                         playerStat.kills = playerStat.kills + 1;
                                     }
 
-                                    if(deaths == 0) {
+                                    if (deaths == 0) {
                                         playerStat.kdr = (playerStat.kills / 1).toFixed(2);
                                     } else {
                                         playerStat.kdr = (playerStat.kills / playerStat.deaths).toFixed(2)
                                     }
                                     next();
 
-                                }, function(err) {
+                                }, function (err) {
                                     playerStats.push(playerStat);
                                     next();
                                 })
-                            }, function(err) {
+                            }, function (err) {
                                 deathsLoaded = deaths;
                                 callback();
                             })
@@ -298,10 +285,10 @@ router.get('/mc/match/:id', function(req, res, next) {
                 },
 
                 //group players into their teams
-                function(callback) {
+                function (callback) {
                     var teams = new Array();
                     console.log('sorting teams...');
-                    async.eachSeries(mapLoaded.teams, function(team, next) {
+                    async.eachSeries(mapLoaded.teams, function (team, next) {
                         console.log('map team: ' + team.id);
                         teams.push({
                             id: team.id,
@@ -316,14 +303,14 @@ router.get('/mc/match/:id', function(req, res, next) {
                             deaths: 0
                         })
                         next();
-                    }, function(err) {
-                        async.eachSeries(match.teamMappings, function(teamMap, next) {
+                    }, function (err) {
+                        async.eachSeries(match.teamMappings, function (teamMap, next) {
 
-                            async.eachSeries(teams, function(team, next) {
+                            async.eachSeries(teams, function (team, next) {
                                 console.log('comparing teams: ' + team.id + " | " + teamMap.team);
-                                if(team.id.toString() == teamMap.team) {
+                                if (team.id.toString() == teamMap.team) {
                                     //get the loaded player
-                                    Common.matchPlayerWithId(playerStats, teamMap.player, function(statPlayer) {
+                                    Common.matchPlayerWithId(playerStats, teamMap.player, function (statPlayer) {
                                         team.members.push(statPlayer);
                                         team.kills += statPlayer.kills;
                                         team.deaths += statPlayer.deaths;
@@ -332,16 +319,16 @@ router.get('/mc/match/:id', function(req, res, next) {
                                 } else {
                                     next();
                                 }
-                            }, function(err) {
+                            }, function (err) {
                                 next();
                             })
-                        }, function(err) {
+                        }, function (err) {
                             teamsLoaded = teams;
                             callback();
                         })
                     })
                 }
-            ], function(err) {
+            ], function (err) {
                 res.json({
                     match: match,
                     playersLoaded: usersCombined,
@@ -355,7 +342,7 @@ router.get('/mc/match/:id', function(req, res, next) {
                 })
             })
         } else {
-            res.json({notFound: true})
+            res.json({ notFound: true })
         }
     });
 });
