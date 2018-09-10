@@ -2,6 +2,7 @@ var nodemailer = require("nodemailer"),
     crypto = require('crypto'),
     algorithm = 'aes-256-ctr';
 var async = require('async');
+import config from '../config';
 
 var privateKey = config.key.privateKey;
 

@@ -3,7 +3,7 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
-var MinecraftPunishment = new Schema({
+const MinecraftPunishment = new Schema({
     punisher: ObjectId,
     punished: ObjectId,
 
@@ -44,9 +44,9 @@ MinecraftPunishment.methods.isBan = function() {
     return this.type.toLowerCase() === 'ban';
 };
 
-mongoose.model('minecraft_punishment', MinecraftPunishment);
+export const MinecraftPunishmentModel = mongoose.model('minecraft_punishment', MinecraftPunishment);
 
-var MinecraftUser = new Schema({
+const MinecraftUser = new Schema({
     name                    : String,
     nameLower               : String,
     uuid                    : String,
@@ -90,18 +90,18 @@ MinecraftUser.methods.loadRanks = function (callback) {
         callback(ranks);
     })
 };
-mongoose.model('minecraft_user', MinecraftUser);
+export const MinecraftUserModel = mongoose.model('minecraft_user', MinecraftUser);
 
-let MinecraftRank = new Schema({
+const MinecraftRank = new Schema({
     name                : String,
     priority            : Number,
     prefix              : String,
     permissions         : [String],
     staff               : Boolean
 });
-mongoose.model('minecraft_rank', MinecraftRank);
+export const MinecraftRankModel = mongoose.model('minecraft_rank', MinecraftRank);
 
-var MinecraftServer = new Schema({
+const MinecraftServer = new Schema({
     name                : String,
     nameLower           : String,
     id                  : String,
@@ -116,9 +116,9 @@ var MinecraftServer = new Schema({
     map                 : String,
     gametype            : String
 });
-mongoose.model('minecraft_server', MinecraftServer);
+export const MinecraftServerModel = mongoose.model('minecraft_server', MinecraftServer);
 
-let MinecraftDeath = new Schema({
+const MinecraftDeath = new Schema({
     player          : ObjectId,
     killer          : ObjectId,
 
@@ -132,9 +132,9 @@ let MinecraftDeath = new Schema({
     playerLoaded    : MinecraftUser,
     killerLoaded    : MinecraftUser
 });
-mongoose.model('minecraft_death', MinecraftDeath);
+export const MinecraftDeathModel = mongoose.model('minecraft_death', MinecraftDeath);
 
-let MinecraftMap = new Schema({
+const MinecraftMap = new Schema({
     name            : String,
     nameLower       : String,
     version         : String,
@@ -150,9 +150,9 @@ let MinecraftMap = new Schema({
         max: Number,
     }]
 });
-mongoose.model('minecraft_map', MinecraftMap);
+export const MinecraftMapModel = mongoose.model('minecraft_map', MinecraftMap);
 
-let MinecraftMatch = new Schema({
+const MinecraftMatch = new Schema({
     map             : ObjectId,
     initializedDate : Number,
     startedDate     : Number,
@@ -176,4 +176,4 @@ let MinecraftMatch = new Schema({
     }],
     finished: Boolean
 });
-mongoose.model('minecraft_match', MinecraftMatch);
+export const MinecraftMatchModel = mongoose.model('minecraft_match', MinecraftMatch);

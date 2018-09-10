@@ -1,16 +1,39 @@
-const express = require('express');
-config = require('./config.json');
-const bodyParser = require('body-parser');
-var logger = require('morgan');
+import express from 'express';
+import config from './config';
+import bodyParser from 'body-parser';
+import logger from 'morgan';
+
+// routes
+import playerRoutes from './routes/minecraft/players';
+import serverRoutes from './routes/minecraft/servers';
+import mapRoutes from './routes/minecraft/maps';
+import leaderboardRoutes from './routes/minecraft/leaderboards';
+import matchRoutes from './routes/minecraft/matches';
+import deathRoutes from './routes/minecraft/deaths';
+import rankRoutes from './routes/minecraft/ranks';
+import punishmentRoutes from './routes/minecraft/punishments';
+import forumsRoutes from './routes/minecraft/forumsgg';
+
 const app = express();
-Common = require('./util/common');
 
-var mongoose = require('mongoose');
-mongoose.connect(config.mongo);
+import mongoose from 'mongoose';
+mongoose.connect(config.mongo, {useMongoClient: true});
+mongoose.Promise = global.Promise;
 
-//models
-require('./models/global.js');
-require('./models/minecraft.js');
+// models
+import './models/global.js';
+import './models/minecraft.js';
+
+// initialize routes
+app.use('/', playerRoutes);
+app.use('/', serverRoutes);
+app.use('/', mapRoutes);
+app.use('/', leaderboardRoutes);
+app.use('/', matchRoutes);
+app.use('/', deathRoutes);
+app.use('/', rankRoutes);
+app.use('/', punishmentRoutes);
+app.use('/', forumsRoutes);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -21,17 +44,6 @@ app.all('/*', function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     next();
 });
-
-/** load routes*/
-require('./routes/minecraft/players')(app);
-require('./routes/minecraft/servers')(app);
-require('./routes/minecraft/maps')(app);
-require('./routes/minecraft/leaderboards')(app);
-require('./routes/minecraft/matches')(app);
-require('./routes/minecraft/deaths')(app);
-require('./routes/minecraft/ranks')(app);
-require('./routes/minecraft/punishments')(app);
-require('./routes/minecraft/forumsgg')(app);
 
 const port = config.port;
 

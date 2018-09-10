@@ -1,4 +1,6 @@
-module.exports = function(req,res,next) {
+import config from '../../config';
+
+export default function (req, res, next) {
     console.log('verifying server...');
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
