@@ -49,7 +49,10 @@ export const MinecraftPunishmentModel = mongoose.model('minecraft_punishment', M
 const MinecraftUser = new Schema({
     name                    : String,
     nameLower               : String,
-    uuid                    : String,
+    uuid: {
+        type: String,
+        index: true
+    },
 
     initialJoinDate         : Number,
     lastOnlineDate          : Number,
