@@ -17,7 +17,7 @@ import forumsRoutes from './routes/minecraft/forumsgg';
 const app = express();
 
 import mongoose from 'mongoose';
-mongoose.connect(config.mongo, {useMongoClient: true});
+mongoose.connect(config.mongo, { useMongoClient: true });
 mongoose.Promise = global.Promise;
 
 // models
@@ -39,7 +39,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(logger('dev'));
 
-app.all('/*', function(req, res, next) {
+app.all('/*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     next();

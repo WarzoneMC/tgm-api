@@ -18,7 +18,7 @@ router.get('/mc/rank/:rank/players', (req, res) => {
             res.status(404).json({ notFound: true });
             return;
         }
-        MinecraftUserModel.find({ranks: rank._id}).exec((err, users) => {
+        MinecraftUserModel.find({ ranks: rank._id }).exec((err, users) => {
             res.json({
                 rank: rank,
                 users: users
@@ -34,7 +34,7 @@ router.get('/mc/player/:name/ranks', verifyServer, (req, res) => {
             res.status(404).json({ notFound: true });
             return;
         }
-        MinecraftRankModel.find({ _id: { $in: user.ranks }}, (err, ranks) => {
+        MinecraftRankModel.find({ _id: { $in: user.ranks } }, (err, ranks) => {
             res.json(ranks);
         });
     });
@@ -52,11 +52,11 @@ router.post('/mc/rank/create', verifyServer, (req, res) => {
         permissions: req.body.permissions,
         staff: req.body.staff
     });
-    rank.save(function(err) {
-        if(err) {
+    rank.save(function (err) {
+        if (err) {
             console.log(err);
         }
-        res.json({rank: rank});
+        res.json({ rank: rank });
         console.log('Registered new minecraft rank: ' + rank.name);
     })
 });
@@ -67,26 +67,26 @@ router.post('/mc/rank/delete', verifyServer, (req, res) => {
         return;
     }
     if (req.body._id) {
-        MinecraftRankModel.findOne({_id: req.body._id}, (err, rank) => {
+        MinecraftRankModel.findOne({ _id: req.body._id }, (err, rank) => {
             if (!rank) {
-                res.json({message: "Rank not found", error: true});
+                res.json({ message: "Rank not found", error: true });
                 return;
             }
-            MinecraftRankModel.remove({_id: req.body._id}, (err, obj) => {
+            MinecraftRankModel.remove({ _id: req.body._id }, (err, obj) => {
                 console.log("Deleted rank " + rank.name);
-                res.json({rank: rank});
+                res.json({ rank: rank });
             });
         });
-        
+
     } else if (req.body.name) {
-        MinecraftRankModel.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
+        MinecraftRankModel.findOne({ name: req.body.name.toLowerCase() }, (err, rank) => {
             if (!rank) {
-                res.json({message: "Rank not found", error: true});
+                res.json({ message: "Rank not found", error: true });
                 return;
             }
-            MinecraftRank.remove({name: req.body.name}, (err, obj) => {
+            MinecraftRank.remove({ name: req.body.name }, (err, obj) => {
                 console.log("Deleted rank " + rank.name);
-                res.json({rank: rank});
+                res.json({ rank: rank });
             });
         });
     }
@@ -98,9 +98,9 @@ router.post('/mc/rank/set/:field', verifyServer, (req, res) => {
         return;
     }
     if (req.body._id) {
-        MinecraftRankModel.findOne({_id: req.body._id}, (err, rank) => {
+        MinecraftRankModel.findOne({ _id: req.body._id }, (err, rank) => {
             if (!rank) {
-                res.json({message: "Rank not found", error: true});
+                res.json({ message: "Rank not found", error: true });
                 return;
             }
             var update = {};
@@ -110,17 +110,17 @@ router.post('/mc/rank/set/:field', verifyServer, (req, res) => {
             if (req.params.field == "staff") update.staff = req.body.value;
 
             console.log(update);
-            
-            MinecraftRankModel.findOneAndUpdate({_id: req.body._id}, {$set: update}, {}, (err, newRank) => {
+
+            MinecraftRankModel.findOneAndUpdate({ _id: req.body._id }, { $set: update }, {}, (err, newRank) => {
                 console.log("Edited rank " + newRank.name);
-                res.json({rank: newRank});
+                res.json({ rank: newRank });
             });
         });
-        
+
     } else if (req.body.name) {
-        MinecraftRankModel.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
+        MinecraftRankModel.findOne({ name: req.body.name.toLowerCase() }, (err, rank) => {
             if (!rank) {
-                res.json({message: "Rank not found", error: true});
+                res.json({ message: "Rank not found", error: true });
                 return;
             }
             var update = {};
@@ -131,12 +131,12 @@ router.post('/mc/rank/set/:field', verifyServer, (req, res) => {
 
             console.log(update);
 
-            MinecraftRankModel.update({name: req.body.name.toLowerCase()}, {$set: update}, (err) => {
+            MinecraftRankModel.update({ name: req.body.name.toLowerCase() }, { $set: update }, (err) => {
                 for (i in update) {
                     rank[i] = update[i];
                 }
                 console.log("Edited rank " + rank.name);
-                res.json({rank: rank});
+                res.json({ rank: rank });
             });
         });
     }
@@ -152,9 +152,9 @@ router.post('/mc/rank/permissions/add', verifyServer, (req, res) => {
         return;
     }
     if (req.body._id) {
-        MinecraftRankModel.findOne({_id: req.body._id}, (err, rank) => {
+        MinecraftRankModel.findOne({ _id: req.body._id }, (err, rank) => {
             if (!rank) {
-                res.json({message: "Rank not found", error: true});
+                res.json({ message: "Rank not found", error: true });
                 return;
             }
             var permissions = (rank.permissions ? rank.permissions : new Array());
@@ -164,16 +164,16 @@ router.post('/mc/rank/permissions/add', verifyServer, (req, res) => {
                     permissions.push(permission);
                 }
             }
-            MinecraftRank.update({name: req.body._id}, {$set: {permissions: permissions}}, (err) => {
+            MinecraftRank.update({ name: req.body._id }, { $set: { permissions: permissions } }, (err) => {
                 console.log("Added permissions to rank " + rank.name + ": " + req.body.permissions);
-                res.json({rank: rank});
+                res.json({ rank: rank });
             });
         });
-        
+
     } else if (req.body.name) {
-        MinecraftRankModel.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
+        MinecraftRankModel.findOne({ name: req.body.name.toLowerCase() }, (err, rank) => {
             if (!rank) {
-                res.json({message: "Rank not found", error: true});
+                res.json({ message: "Rank not found", error: true });
                 return;
             }
             var permissions = (rank.permissions ? rank.permissions : new Array());
@@ -183,10 +183,10 @@ router.post('/mc/rank/permissions/add', verifyServer, (req, res) => {
                     permissions.push(permission);
                 }
             }
-            MinecraftRankModel.update({name: req.body.name.toLowerCase()}, {$set: {permissions: permissions}}, (err) => {
-                
+            MinecraftRankModel.update({ name: req.body.name.toLowerCase() }, { $set: { permissions: permissions } }, (err) => {
+
                 console.log("Added permissions to rank " + rank.name + ": " + req.body.permissions);
-                res.json({rank: rank});
+                res.json({ rank: rank });
             });
         });
     }
@@ -202,9 +202,9 @@ router.post('/mc/rank/permissions/remove', verifyServer, (req, res) => {
         return;
     }
     if (req.body._id) {
-        MinecraftRankModel.findOne({_id: req.body._id}, (err, rank) => {
+        MinecraftRankModel.findOne({ _id: req.body._id }, (err, rank) => {
             if (!rank) {
-                res.json({message: "Rank not found", error: true});
+                res.json({ message: "Rank not found", error: true });
                 return;
             }
             for (var i in req.body.permissions) {
@@ -213,16 +213,16 @@ router.post('/mc/rank/permissions/remove', verifyServer, (req, res) => {
                     rank.permissions.splice(i, 1);
                 }
             }
-            MinecraftRankModel.update({name: req.body._id}, {$set: {permissions: rank.permissions}}, (err) => {
+            MinecraftRankModel.update({ name: req.body._id }, { $set: { permissions: rank.permissions } }, (err) => {
                 console.log("Removed permissions from rank " + rank.name + ": " + req.body.permissions);
-                res.json({rank: rank});
+                res.json({ rank: rank });
             });
         });
-        
+
     } else if (req.body.name) {
-        MinecraftRankModel.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
+        MinecraftRankModel.findOne({ name: req.body.name.toLowerCase() }, (err, rank) => {
             if (!rank) {
-                res.json({message: "Rank not found", error: true});
+                res.json({ message: "Rank not found", error: true });
                 return;
             }
             for (var i in req.body.permissions) {
@@ -231,10 +231,10 @@ router.post('/mc/rank/permissions/remove', verifyServer, (req, res) => {
                     rank.permissions.splice(rank.permissions.indexOf(permission), 1);
                 }
             }
-            MinecraftRankModel.update({name: req.body.name.toLowerCase()}, {$set: {permissions: rank.permissions}}, (err) => {
-                
+            MinecraftRankModel.update({ name: req.body.name.toLowerCase() }, { $set: { permissions: rank.permissions } }, (err) => {
+
                 console.log("Removed permissions from rank " + rank.name + ": " + req.body.permissions);
-                res.json({rank: rank});
+                res.json({ rank: rank });
             });
         });
     }
@@ -283,12 +283,12 @@ router.post('/mc/player/:name/rank/add', verifyServer, (req, res) => {
                     $addToSet: { ranks: rank._id }
                 }, (err) => {
                     console.log('Added rank ' + rank.name + ' to ' + user.name + '\'s profile.');
-                    res.json({rank: rank});
+                    res.json({ rank: rank });
                     return;
                 });
             });
         } else if (req.body.rankName) {
-                        
+
             let rankName = req.body.rankName.toLowerCase();
             MinecraftRankModel.findOne({ name: rankName }, (err, rank) => {
                 if (!rank) {
@@ -310,7 +310,7 @@ router.post('/mc/player/:name/rank/add', verifyServer, (req, res) => {
                 }, (err) => {
                     console.log(user._id + ": " + rank._id)
                     console.log('Added rank ' + rank.name + ' to ' + user.name + '\'s profile.');
-                    res.json({rank: rank});
+                    res.json({ rank: rank });
                     return;
                 });
             });
@@ -368,7 +368,7 @@ router.post('/mc/player/:name/rank/remove', verifyServer, (req, res) => {
                         $pull: { ranks: rank._id }
                     }, (err) => {
                         console.log('Removed rank ' + (rank ? rank.name : rankId.toString()) + ' from ' + user.name + '\'s profile.');
-                        res.json({rank: rank});
+                        res.json({ rank: rank });
                         return;
                     })
                 })
@@ -395,10 +395,10 @@ router.post('/mc/player/:name/rank/remove', verifyServer, (req, res) => {
                 }, (err) => {
                     console.log(user._id + ": " + rank._id)
                     console.log('Removed rank ' + rank.name + ' from ' + user.name + '\'s profile.');
-                    res.json({rank: rank});
+                    res.json({ rank: rank });
                     return;
                 });
-            });         
+            });
         }
     });
 })

@@ -5,10 +5,10 @@ export default function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
     if (token) {
-        if(token === config.server.token) {
+        if (token === config.server.token) {
             next(); // good to go
         } else {
-            return res.json({"error": true}); //token was incorrect.
+            return res.json({ "error": true }); //token was incorrect.
         }
     } else {
         // failed without token
