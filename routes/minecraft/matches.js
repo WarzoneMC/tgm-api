@@ -1,9 +1,11 @@
 var mongoose = require("mongoose");
 import verifyServer from './verifyServer';
 var async = require('async');
+import config from '../../config';
 
-import { MinecraftUserModel, MinecraftMatchModel, MinecraftMapModel, MinecraftDeathModel } from "../../models/minecraft";
+import { MinecraftUserModel, MinecraftMatchModel, MinecraftMapModel, MinecraftDeathModel, MinecraftMatchChatModel } from "../../models/minecraft";
 import express from 'express';
+import { resolve } from "path";
 const router = express.Router();
 
 /**
@@ -40,10 +42,6 @@ router.post('/mc/match/load', verifyServer, function (req, res) {
 router.post('/mc/match/finish', verifyServer, async (req, res) => {
     console.log('match finish body:', req.body);
 
-    for(let chat of req.body.chat) {
-        chat.user = new mongoose.Types.ObjectId(chat.user);
-    }
-
     const deaths = [];
     for(let death of req.body.deaths) {
         deaths.push(new mongoose.Types.ObjectId(death));
@@ -67,7 +65,6 @@ router.post('/mc/match/finish', verifyServer, async (req, res) => {
             map: new mongoose.Types.ObjectId(req.body.map),
             startedDate: req.body.startedDate,
             finishedDate: req.body.finishedDate,
-            chat: chat,
             deaths: deaths,
             winners: winners,
             losers: loser,
@@ -76,6 +73,29 @@ router.post('/mc/match/finish', verifyServer, async (req, res) => {
             participants: allUserids
         }
     }).exec();
+
+    if(config.saveChat) {
+        // async
+        new Promise((resolve, reject) => {
+            console.log('Inserting chat into DB...');
+            let timeStarted = Date.now();
+            for(let chat of req.body.chat) {
+                const chatDoc = new MinecraftMatchChatModel({
+                    match: new mongoose.Types.ObjectId(req.body.id),
+                    user: new mongoose.Types.ObjectId(chat.user),
+                    username: chat.username,
+                    uuid: chat.uuid,
+                    message: chat.message,
+                    team: chat.team,
+                    matchTime: chat.matchTime,
+                    teamChat: chat.teamChat
+                });
+                await chatDoc.save();
+            }
+            let timeDiff = Date.now() - timeStarted;
+            console.log(`Finished inserting chat after ${timeDiff}ms`);
+        })
+    }
 
     await MinecraftUserModel.updateMany({_id: { $in: winners }}, {$inc: { wins: 1}}).exec();
     await MinecraftUserModel.updateMany({_id: { $in: losers }}, {$inc: { losses: 1}}).exec();
