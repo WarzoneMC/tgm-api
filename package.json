@@ -1,13 +1,22 @@
 {
   "name": "warzone-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "The API for the Warzone gamemode.",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WarzoneMC/API.git"
+  },
+  "author": "lukechatton",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WarzoneMC/API/issues"
+  },
+  "homepage": "https://github.com/WarzoneMC/API#readme",
   "dependencies": {
     "body-parser": "^1.17.1",
     "crypto": "0.0.3",
@@ -16,6 +25,6 @@
     "mongoose": "^4.9.7",
     "morgan": "^1.8.1",
     "nodemailer": "^4.0.1",
-    "request": "^2.81.0"
+    "request": "^2.81.0"  
   }
 }
