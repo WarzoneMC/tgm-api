@@ -190,38 +190,46 @@ module.exports = function(app) {
                     }
                     ips.push(req.body.ip);
                 }
-                MinecraftUser.update({uuid: req.body.uuid}, {$set: {
-                    name: req.body.name,
-                    nameLower: req.body.name.toLowerCase(),
-                    lastOnlineDate: new Date().getTime(),
-                    ips: ips
-                }}, function(err) {
+                MinecraftPunishment.find(
+                    {
+                        $or: [
+                            {
+                                punished: user._id,
+                                reverted: false
+                            }, {
+                                ip: req.body.ip,
+                                ip_ban: true,
+                                reverted: false
+                            }
+                        ]
+                    }).sort('+issued').exec(function (err, punishes) {
                     if (err) console.log(err);
-                    MinecraftPunishment.find(
-                        {
-                            $or: [
-                                {
-                                    punished: user._id,
-                                    reverted: false
-                                }, {
-                                    ip: req.body.ip,
-                                    ip_ban: true,
-                                    reverted: false
-                                }
-                            ]
-                        }).sort('+issued').exec(function (err, punishes) {
-                        if (err) console.log(err);
-                        var punishments = new Array();
-                        for (var i in punishes) {
-                            var punishment = punishes[i];
-                            if (punishment) {
-                                punishments = punishments.filter(function(p){
-                                    return p.type !== punishment.type;
-                                });
+                    var isBanned = false;
+                    var punishments = new Array();
+                    for (var i in punishes) {
+                        var punishment = punishes[i];
+                        if (punishment) {
+                            punishments = punishments.filter(function(p){
+                                return p.type !== punishment.type;
+                            });
+                            if (punishment.isActive()) {
                                 punishments.push(punishment);
-                                if (!punishment.isActive()) punishments.pop();
+                                if (punishment.isBan()) {
+                                    isBanned = true;
+                                }
                             }
                         }
+                    }
+                    var query = {
+                        name: req.body.name,
+                        nameLower: req.body.name.toLowerCase(),
+                        ips: ips
+                    };
+                    if (!isBanned) {
+                        query.lastOnlineDate = Date.now();
+                    }
+                    MinecraftUser.update({uuid: req.body.uuid}, {$set: query}, function(err) {
+                        if (err) console.log(err);
                         user.punishments = punishments;
                         MinecraftRank.find({ _id: { $in: user.ranks } }, (err, ranks) => {
                             if (err) console.log(err);

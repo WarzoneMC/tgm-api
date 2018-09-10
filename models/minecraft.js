@@ -40,6 +40,10 @@ MinecraftPunishment.methods.shouldKick = function() {
     return this.type.toLowerCase() === 'ban' || this.type.toLowerCase() === 'kick';
 };
 
+MinecraftPunishment.methods.isBan = function() {
+    return this.type.toLowerCase() === 'ban';
+};
+
 mongoose.model('minecraft_punishment', MinecraftPunishment);
 
 var MinecraftUser = new Schema({
