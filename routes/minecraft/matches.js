@@ -43,7 +43,6 @@ module.exports = function (app) {
      */
     app.post('/mc/match/finish', verifyServer, function(req, res) {
         console.log('match body: ' + JSON.stringify(req.body, null, 2));
-        return res.json({});
 
         var allUserIds = new Array();
         async.eachSeries(req.body.chat, function(chat, next) {
