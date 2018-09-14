@@ -23,6 +23,10 @@ mongoose.Promise = global.Promise;
 import './models/global.js';
 import './models/minecraft.js';
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(logger('dev'));
+
 // initialize routes
 app.use('/', playerRoutes);
 app.use('/', serverRoutes);
@@ -33,10 +37,6 @@ app.use('/', deathRoutes);
 app.use('/', rankRoutes);
 app.use('/', punishmentRoutes);
 app.use('/', forumsRoutes);
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(logger('dev'));
 
 app.all('/*', function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
