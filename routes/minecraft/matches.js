@@ -76,7 +76,7 @@ router.post('/mc/match/finish', verifyServer, async (req, res) => {
 
     if(config.saveChat) {
         // async
-        new Promise((resolve, reject) => {
+        new Promise(async (resolve, reject) => {
             console.log('Inserting chat into DB...');
             let timeStarted = Date.now();
             for(let chat of req.body.chat) {
