@@ -16,8 +16,16 @@ import forumsRoutes from './routes/minecraft/forumsgg';
 const app = express();
 
 import mongoose from 'mongoose';
-mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost/teamgg', { useMongoClient: true });
 mongoose.Promise = global.Promise;
+
+const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost/teamgg';
+console.log('Connecting to mongo at ' + mongoUrl);
+mongoose.connect(mongoUrl, { useMongoClient: true }).then(() => {
+    console.log('Successfully connected to mongo.');
+}, err => {
+    console.error('Failed to connect to mongo:', err);
+    process.exit(1);
+});
 
 // models
 import './models/global.js';
