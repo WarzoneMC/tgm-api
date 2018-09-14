@@ -1,7 +1,6 @@
 var mongoose = require("mongoose");
 import verifyServer from './verifyServer';
 var async = require('async');
-import config from '../../config';
 
 import { MinecraftUserModel, MinecraftMatchModel, MinecraftMapModel, MinecraftDeathModel, MinecraftMatchChatModel } from "../../models/minecraft";
 import express from 'express';
@@ -74,7 +73,7 @@ router.post('/mc/match/finish', verifyServer, async (req, res) => {
         }
     }).exec();
 
-    if(config.saveChat) {
+    if(process.env.SAVE_CHAT) {
         // async
         new Promise(async (resolve, reject) => {
             console.log('Inserting chat into DB...');

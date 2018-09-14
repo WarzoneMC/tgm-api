@@ -1,11 +1,10 @@
-import config from '../../config';
-
 export default function (req, res, next) {
     console.log('verifying server...');
-    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+    const token = req.body.token || req.query.token || req.headers['x-access-token'];
+    const storedToken = process.env.AUTH_SERVER_TOKEN || 'dummy';
 
     if (token) {
-        if (token === config.server.token) {
+        if (token === storedToken) {
             next(); // good to go
         } else {
             return res.json({ "error": true }); //token was incorrect.

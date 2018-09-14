@@ -1,5 +1,4 @@
 import express from 'express';
-import config from './config';
 import bodyParser from 'body-parser';
 import logger from 'morgan';
 
@@ -17,7 +16,7 @@ import forumsRoutes from './routes/minecraft/forumsgg';
 const app = express();
 
 import mongoose from 'mongoose';
-mongoose.connect(config.mongo, { useMongoClient: true });
+mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost/teamgg', { useMongoClient: true });
 mongoose.Promise = global.Promise;
 
 // models
@@ -45,8 +44,7 @@ app.all('/*', function (req, res, next) {
     next();
 });
 
-const port = config.port;
-
-app.listen(process.env.PORT || port);
+const port = process.env.PORT || 3000;
+app.listen(port);
 
 console.log('API server started on port ' + port);
