@@ -1,5 +1,3 @@
-var request = require('request');
-
 var mongoose = require("mongoose");
 var User = mongoose.model('user');
 var MinecraftUser = mongoose.model('minecraft_user');
