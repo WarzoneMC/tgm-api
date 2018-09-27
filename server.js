@@ -4,7 +4,7 @@ const app = express();
 Common = require('./util/common');
 
 var mongoose = require('mongoose');
-mongoose.connect(config.mongo);
+mongoose.connect(config.mongo, { useMongoClient: true });
 
 //models
 require('./models/global.js');
