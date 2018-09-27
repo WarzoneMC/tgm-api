@@ -1,7 +1,6 @@
 const express = require('express');
 config = require('./config.json');
 const bodyParser = require('body-parser');
-var logger = require('morgan');
 const app = express();
 Common = require('./util/common');
 
@@ -14,7 +13,7 @@ require('./models/minecraft.js');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(logger('dev'));
+app.use(require('morgan')('dev'));
 
 app.all('/*', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
