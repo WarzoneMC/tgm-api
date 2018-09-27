@@ -33,6 +33,4 @@ require('./routes/minecraft/forumsgg')(app);
 
 const port = config.port;
 
-app.listen(process.env.PORT || port);
-
-console.log('API server started on port ' + port);
+app.listen(process.env.PORT || port, () => console.log('API server started on port ' + port));
