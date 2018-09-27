@@ -1,7 +1,4 @@
 var mongoose = require("mongoose");
-var User = mongoose.model('user');
-var MinecraftUser = mongoose.model('minecraft_user');
-var MinecraftServer = mongoose.model('minecraft_server');
 var MinecraftMap = mongoose.model('minecraft_map');
 var verifyServer = require('./verifyServer');
 

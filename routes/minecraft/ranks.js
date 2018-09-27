@@ -1,6 +1,5 @@
 let mongoose = require("mongoose");
 let verifyServer = require('./verifyServer');
-let async = require('async');
 
 let MinecraftUser = mongoose.model('minecraft_user');
 let MinecraftRank = mongoose.model('minecraft_rank');

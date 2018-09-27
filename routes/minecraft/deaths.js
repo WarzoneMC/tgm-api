@@ -4,7 +4,6 @@ var async = require('async');
 
 var MinecraftUser = mongoose.model('minecraft_user');
 var MinecraftDeath = mongoose.model('minecraft_death');
-var MinecraftMatch = mongoose.model('minecraft_match');
 
 module.exports = function(app) {
 
