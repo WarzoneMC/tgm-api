@@ -57,7 +57,7 @@ function encrypt(password) {
 }
 
 exports.hash = function(string) {
-    return s.split('').reduce((a, b) => { a = ((a << 5) -a) + b.charCodeAt(0); return a&a; }, 0);              
+    return string.split('').reduce((a, b) => { a = ((a << 5) -a) + b.charCodeAt(0); return a & a; }, 0);              
 }
 
 function mail(from, email, subject, mailbody){

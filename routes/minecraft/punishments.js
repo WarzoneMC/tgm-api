@@ -18,7 +18,7 @@ module.exports = function(app) {
                             punisher: punisher ? punisher._id : null,
                             punished: punished._id,
                             
-                            ip: (req.body.ip ? req.body.ip : punished.ips[punished.ips.length - 1]),
+                            ip: (req.body.ip ? Common.hash(req.body.ip) : punished.ips[punished.ips.length - 1]),
                             ip_ban: (req.body.ip_ban ? req.body.ip_ban : false),
 
                             type: req.body.type.toUpperCase(),
@@ -55,7 +55,7 @@ module.exports = function(app) {
                         punisher: punisher._id,
                         punished: null,
                         
-                        ip: req.body.ip,
+                        ip: Common.hash(req.body.ip),
                         ip_ban: true,
 
                         type: req.body.type.toUpperCase(),
@@ -124,7 +124,7 @@ module.exports = function(app) {
 
     app.post('/mc/player/punishments', verifyServer, function(req, res) {
         var result;
-        if (req.body.ip) result = MinecraftUser.find({ips: req.body.ip});
+        if (req.body.ip) result = MinecraftUser.find({ips: Common.hash(req.body.ip)});
         else if (req.body.name) result = MinecraftUser.find({nameLower: req.body.name.toLowerCase()}).sort('-lastOnlineDate').limit(1);
         else {
             res.json({notFound: true});
@@ -140,7 +140,7 @@ module.exports = function(app) {
             var loadedUsers = {};
             var ids = [];
             async.eachSeries(users, function (user, next) {
-                MinecraftPunishment.find(req.body.ip ? {punished: user._id, ip: req.body.ip} : {punished: user._id}).exec(function(err, punishments) {
+                MinecraftPunishment.find(req.body.ip ? {punished: user._id, ip: Common.hash(req.body.ip)} : {punished: user._id}).exec(function(err, punishments) {
                     if (err) console.log(err);
                     for (var i in punishments) {
                         var punishment = punishments[i];
