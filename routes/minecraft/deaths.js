@@ -1,10 +1,9 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
 var verifyServer = require('./verifyServer');
 var async = require('async');
 
 var MinecraftUser = mongoose.model('minecraft_user');
 var MinecraftDeath = mongoose.model('minecraft_death');
-var MinecraftMatch = mongoose.model('minecraft_match');
 
 module.exports = function(app) {
 

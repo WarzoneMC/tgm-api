@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
 var MinecraftUser = mongoose.model('minecraft_user');
 
 module.exports = function(app) {
@@ -6,7 +6,7 @@ module.exports = function(app) {
     app.get('/mc/leaderboard/kills', function(req, res, next) {
         MinecraftUser
             .find({})
-            .sort("-kills")
+            .sort('-kills')
             .limit(25)
             .exec(function(err, users) {
                if(err) console.log(err);

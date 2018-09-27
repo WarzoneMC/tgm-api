@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
 var verifyServer = require('./verifyServer');
 var async = require('async');
 
@@ -18,7 +18,7 @@ module.exports = function(app) {
                             punisher: punisher ? punisher._id : null,
                             punished: punished._id,
                             
-                            ip: (req.body.ip ? req.body.ip : punished.ips[punished.ips.length - 1]),
+                            ip: (req.body.ip ? Common.hash(req.body.ip) : punished.ips[punished.ips.length - 1]),
                             ip_ban: (req.body.ip_ban ? req.body.ip_ban : false),
 
                             type: req.body.type.toUpperCase(),
@@ -33,7 +33,7 @@ module.exports = function(app) {
                             if (err) {
                                 console.log(err);
                             }
-                            console.log("Saved punishment: " + JSON.stringify(punishment))
+                            console.log('Saved punishment: ' + JSON.stringify(punishment))
                             res.json({
                                 punishment: punishment,
                                 kickable: punishment.shouldKick(),
@@ -55,7 +55,7 @@ module.exports = function(app) {
                         punisher: punisher._id,
                         punished: null,
                         
-                        ip: req.body.ip,
+                        ip: Common.hash(req.body.ip),
                         ip_ban: true,
 
                         type: req.body.type.toUpperCase(),
@@ -111,7 +111,7 @@ module.exports = function(app) {
                             loadedUsers: loadedUsers,
                             success: success
                         });
-                        console.log("Reverted punishment: " + punishment._id); 
+                        console.log('Reverted punishment: ' + punishment._id); 
                     });
                     
                 });
@@ -124,7 +124,7 @@ module.exports = function(app) {
 
     app.post('/mc/player/punishments', verifyServer, function(req, res) {
         var result;
-        if (req.body.ip) result = MinecraftUser.find({ips: req.body.ip});
+        if (req.body.ip) result = MinecraftUser.find({ips: Common.hash(req.body.ip)});
         else if (req.body.name) result = MinecraftUser.find({nameLower: req.body.name.toLowerCase()}).sort('-lastOnlineDate').limit(1);
         else {
             res.json({notFound: true});
@@ -140,7 +140,7 @@ module.exports = function(app) {
             var loadedUsers = {};
             var ids = [];
             async.eachSeries(users, function (user, next) {
-                MinecraftPunishment.find(req.body.ip ? {punished: user._id, ip: req.body.ip} : {punished: user._id}).exec(function(err, punishments) {
+                MinecraftPunishment.find(req.body.ip ? {punished: user._id, ip: Common.hash(req.body.ip)} : {punished: user._id}).exec(function(err, punishments) {
                     if (err) console.log(err);
                     for (var i in punishments) {
                         var punishment = punishments[i];
@@ -180,7 +180,7 @@ module.exports = function(app) {
 
     app.get('/mc/punishment/latest', function(req, res) {
         var limit = req.query.limit && Number.isInteger(parseInt(req.query.limit)) && parseInt(req.query.limit) <= 20 ? parseInt(req.query.limit) : 10;
-        MinecraftPunishment.find({reverted: false}).sort("-issued").limit(limit).exec(function (err, puns){
+        MinecraftPunishment.find({reverted: false}).sort('-issued').limit(limit).exec(function (err, puns){
             var punishments = new Array();
             async.eachSeries(puns, function (pun, next) {
                 var punishment = pun.toJSON();

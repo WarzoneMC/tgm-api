@@ -1,6 +1,7 @@
-let mongoose = require("mongoose");
+let mongoose = require('mongoose');
 let verifyServer = require('./verifyServer');
 let async = require('async');
+let Common = require('../../util/common');
 
 let MinecraftUser = mongoose.model('minecraft_user');
 let MinecraftDeath = mongoose.model('minecraft_death');
@@ -12,7 +13,7 @@ var MinecraftPunishment = mongoose.model('minecraft_punishment');
 module.exports = function(app) {
 
     app.get('/mc/player/:name', function(req, res, next) {
-        MinecraftUser.find({nameLower: req.params.name.toLowerCase()}).sort("-lastOnlineDate").limit(1).exec(function(err, users) {
+        MinecraftUser.find({nameLower: req.params.name.toLowerCase()}).sort('-lastOnlineDate').limit(1).exec(function(err, users) {
             var user = users[0];
             if(err) {
                 console.log(err);
@@ -139,7 +140,7 @@ module.exports = function(app) {
 
     app.post('/mc/player/lookup', verifyServer, function(req, res) {
         if (req.body.ip) {
-            MinecraftUser.find({ips: req.body.ip}).exec((err, users) => {
+            MinecraftUser.find({ips: Common.hash(req.body.ip)}).exec((err, users) => {
                 if (err) console.log(err);
                 var foundUsers = [];
                 for (var i in users) {
@@ -169,7 +170,7 @@ module.exports = function(app) {
         } else {
             res.json({
                 error: true,
-                message: "Query filter not included in the request."
+                message: 'Query filter not included in the request.'
             });
         }
     });
@@ -185,10 +186,10 @@ module.exports = function(app) {
             if(user) {
                 var ips = user.ips;
                 if (req.body.ip) {
-                    if(ips.indexOf(req.body.ip) >= 0) {
-                        ips.splice(ips.indexOf(req.body.ip), 1);
+                    if(ips.indexOf(Common.hash(req.body.ip)) >= 0) {
+                        ips.splice(ips.indexOf(Common.hash(req.body.ip)), 1);
                     }
-                    ips.push(req.body.ip);
+                    ips.push(Common.hash(req.body.ip));
                 }
                 MinecraftPunishment.find(
                     {
@@ -197,7 +198,7 @@ module.exports = function(app) {
                                 punished: user._id,
                                 reverted: false
                             }, {
-                                ip: req.body.ip,
+                                ip: Common.hash(req.body.ip),
                                 ip_ban: true,
                                 reverted: false
                             }
@@ -241,7 +242,7 @@ module.exports = function(app) {
                     });
                 });
             } else {
-
+                var ip = Common.hash(req.body.ip);
                 user = new MinecraftUser({
                     name: req.body.name,
                     nameLower: req.body.name.toLowerCase(),
@@ -251,13 +252,13 @@ module.exports = function(app) {
                     lastOnlineDate: new Date().getTime(),
 
                     ranks: [],
-                    ips: [req.body.ip]
+                    ips: [ip]
                 });
                 user.save(function(err) {
                     if(err) {
                         console.log(err);
                     }
-                    MinecraftPunishment.find({ip: req.body.ip, ip_ban: true}).sort('+issued').exec(function (err, punishes) {
+                    MinecraftPunishment.find({ip: Common.hash(req.body.ip), ip_ban: true}).sort('+issued').exec(function (err, punishes) {
                         var punishments = new Array();
                         for (var i in punishes) {
                             var punishment = punishes[i];
