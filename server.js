@@ -31,6 +31,6 @@ require('./routes/minecraft/ranks')(app);
 require('./routes/minecraft/punishments')(app);
 require('./routes/minecraft/forumsgg')(app);
 
-const port = config.port;
-
-app.listen(process.env.PORT || port, () => console.log('API server started on port ' + port));
+const port = process.env.PORT ? process.env.PORT : config.port;
+if (!port) throw new Error('No port specified');
+app.listen(port, () => console.log('API server started on port ' + port));
