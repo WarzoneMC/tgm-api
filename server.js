@@ -1,6 +1,5 @@
 const express = require('express');
 config = require('./config.json');
-const bodyParser = require('body-parser');
 const app = express();
 Common = require('./util/common');
 
@@ -11,8 +10,8 @@ mongoose.connect(config.mongo);
 require('./models/global.js');
 require('./models/minecraft.js');
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(require('morgan')('dev'));
 
 app.all('/*', function(req, res, next) {
