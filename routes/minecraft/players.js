@@ -1,4 +1,4 @@
-let mongoose = require("mongoose");
+let mongoose = require('mongoose');
 let verifyServer = require('./verifyServer');
 let async = require('async');
 
@@ -12,7 +12,7 @@ var MinecraftPunishment = mongoose.model('minecraft_punishment');
 module.exports = function(app) {
 
     app.get('/mc/player/:name', function(req, res, next) {
-        MinecraftUser.find({nameLower: req.params.name.toLowerCase()}).sort("-lastOnlineDate").limit(1).exec(function(err, users) {
+        MinecraftUser.find({nameLower: req.params.name.toLowerCase()}).sort('-lastOnlineDate').limit(1).exec(function(err, users) {
             var user = users[0];
             if(err) {
                 console.log(err);
@@ -169,7 +169,7 @@ module.exports = function(app) {
         } else {
             res.json({
                 error: true,
-                message: "Query filter not included in the request."
+                message: 'Query filter not included in the request.'
             });
         }
     });

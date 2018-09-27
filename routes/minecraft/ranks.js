@@ -1,4 +1,4 @@
-let mongoose = require("mongoose");
+let mongoose = require('mongoose');
 let verifyServer = require('./verifyServer');
 
 let MinecraftUser = mongoose.model('minecraft_user');
@@ -28,7 +28,7 @@ module.exports = function (app) {
     });
 
     app.get('/mc/player/:name/ranks', verifyServer, (req, res) => {
-        MinecraftUser.find({ nameLower: req.params.name.toLowerCase() }).sort("-lastOnlineDate").limit(1).exec((err, users) => {
+        MinecraftUser.find({ nameLower: req.params.name.toLowerCase() }).sort('-lastOnlineDate').limit(1).exec((err, users) => {
             var user = users[0];
             if (!user) {
                 res.status(404).json({ notFound: true });
@@ -42,7 +42,7 @@ module.exports = function (app) {
 
     app.post('/mc/rank/create', verifyServer, (req, res) => {
         if (!req.body.name) {
-            res.status(400).json({ message: "Rank not included in request.", error: true });
+            res.status(400).json({ message: 'Rank not included in request.', error: true });
             return;
         }
         var rank = new MinecraftRank({
@@ -63,17 +63,17 @@ module.exports = function (app) {
 
     app.post('/mc/rank/delete', verifyServer, (req, res) => {
         if (!req.body.name && !req.body._id) {
-            res.status(400).json({ message: "Rank not included in request.", error: true });
+            res.status(400).json({ message: 'Rank not included in request.', error: true });
             return;
         }
         if (req.body._id) {
             MinecraftRank.findOne({_id: req.body._id}, (err, rank) => {
                 if (!rank) {
-                    res.json({message: "Rank not found", error: true});
+                    res.json({message: 'Rank not found', error: true});
                     return;
                 }
                 MinecraftRank.remove({_id: req.body._id}, (err, obj) => {
-                    console.log("Deleted rank " + rank.name);
+                    console.log('Deleted rank ' + rank.name);
                     res.json({rank: rank});
                 });
             });
@@ -81,11 +81,11 @@ module.exports = function (app) {
         } else if (req.body.name) {
             MinecraftRank.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
                 if (!rank) {
-                    res.json({message: "Rank not found", error: true});
+                    res.json({message: 'Rank not found', error: true});
                     return;
                 }
                 MinecraftRank.remove({name: req.body.name}, (err, obj) => {
-                    console.log("Deleted rank " + rank.name);
+                    console.log('Deleted rank ' + rank.name);
                     res.json({rank: rank});
                 });
             });
@@ -94,25 +94,25 @@ module.exports = function (app) {
 
     app.post('/mc/rank/set/:field', verifyServer, (req, res) => {
         if (!req.body.name && !req.body._id && req.body.value) {
-            res.status(400).json({ message: "Rank not included in request.", error: true });
+            res.status(400).json({ message: 'Rank not included in request.', error: true });
             return;
         }
         if (req.body._id) {
             MinecraftRank.findOne({_id: req.body._id}, (err, rank) => {
                 if (!rank) {
-                    res.json({message: "Rank not found", error: true});
+                    res.json({message: 'Rank not found', error: true});
                     return;
                 }
                 var update = {};
-                if (req.params.field == "prefix") update.prefix = req.body.value;
-                if (req.params.field == "priority") update.priority = req.body.value;
-                if (req.params.field == "permissions") update.permissions = req.body.value;
-                if (req.params.field == "staff") update.staff = req.body.value;
+                if (req.params.field == 'prefix') update.prefix = req.body.value;
+                if (req.params.field == 'priority') update.priority = req.body.value;
+                if (req.params.field == 'permissions') update.permissions = req.body.value;
+                if (req.params.field == 'staff') update.staff = req.body.value;
 
                 console.log(update);
                 
                 MinecraftRank.findOneAndUpdate({_id: req.body._id}, {$set: update}, {}, (err, newRank) => {
-                    console.log("Edited rank " + newRank.name);
+                    console.log('Edited rank ' + newRank.name);
                     res.json({rank: newRank});
                 });
             });
@@ -120,14 +120,14 @@ module.exports = function (app) {
         } else if (req.body.name) {
             MinecraftRank.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
                 if (!rank) {
-                    res.json({message: "Rank not found", error: true});
+                    res.json({message: 'Rank not found', error: true});
                     return;
                 }
                 var update = {};
-                if (req.params.field == "prefix") update.prefix = req.body.value;
-                if (req.params.field == "priority") update.priority = req.body.value;
-                if (req.params.field == "permissions") update.permissions = req.body.value;
-                if (req.params.field == "staff") update.staff = req.body.value;
+                if (req.params.field == 'prefix') update.prefix = req.body.value;
+                if (req.params.field == 'priority') update.priority = req.body.value;
+                if (req.params.field == 'permissions') update.permissions = req.body.value;
+                if (req.params.field == 'staff') update.staff = req.body.value;
 
                 console.log(update);
 
@@ -135,7 +135,7 @@ module.exports = function (app) {
                     for (i in update) {
                         rank[i] = update[i];
                     }
-                    console.log("Edited rank " + rank.name);
+                    console.log('Edited rank ' + rank.name);
                     res.json({rank: rank});
                 });
             });
@@ -144,17 +144,17 @@ module.exports = function (app) {
 
     app.post('/mc/rank/permissions/add', verifyServer, (req, res) => {
         if (!req.body.name && !req.body._id) {
-            res.status(400).json({ message: "Rank not included in request.", error: true });
+            res.status(400).json({ message: 'Rank not included in request.', error: true });
             return;
         }
         if (!req.body.permissions || !(req.body.permissions instanceof Array)) {
-            res.status(400).json({ message: "Rank permissions not specified.", error: true });
+            res.status(400).json({ message: 'Rank permissions not specified.', error: true });
             return;
         }
         if (req.body._id) {
             MinecraftRank.findOne({_id: req.body._id}, (err, rank) => {
                 if (!rank) {
-                    res.json({message: "Rank not found", error: true});
+                    res.json({message: 'Rank not found', error: true});
                     return;
                 }
                 var permissions = (rank.permissions ? rank.permissions : new Array());
@@ -165,7 +165,7 @@ module.exports = function (app) {
                     }
                 }
                 MinecraftRank.update({name: req.body._id}, {$set: {permissions: permissions}}, (err) => {
-                    console.log("Added permissions to rank " + rank.name + ": " + req.body.permissions);
+                    console.log('Added permissions to rank ' + rank.name + ': ' + req.body.permissions);
                     res.json({rank: rank});
                 });
             });
@@ -173,7 +173,7 @@ module.exports = function (app) {
         } else if (req.body.name) {
             MinecraftRank.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
                 if (!rank) {
-                    res.json({message: "Rank not found", error: true});
+                    res.json({message: 'Rank not found', error: true});
                     return;
                 }
                 var permissions = (rank.permissions ? rank.permissions : new Array());
@@ -185,7 +185,7 @@ module.exports = function (app) {
                 }
                 MinecraftRank.update({name: req.body.name.toLowerCase()}, {$set: {permissions: permissions}}, (err) => {
                     
-                    console.log("Added permissions to rank " + rank.name + ": " + req.body.permissions);
+                    console.log('Added permissions to rank ' + rank.name + ': ' + req.body.permissions);
                     res.json({rank: rank});
                 });
             });
@@ -194,17 +194,17 @@ module.exports = function (app) {
 
     app.post('/mc/rank/permissions/remove', verifyServer, (req, res) => {
         if (!req.body.name && !req.body._id) {
-            res.status(400).json({ message: "Rank not included in request.", error: true });
+            res.status(400).json({ message: 'Rank not included in request.', error: true });
             return;
         }
         if (!req.body.permissions || !(req.body.permissions instanceof Array)) {
-            res.status(400).json({ message: "Rank permissions not specified.", error: true });
+            res.status(400).json({ message: 'Rank permissions not specified.', error: true });
             return;
         }
         if (req.body._id) {
             MinecraftRank.findOne({_id: req.body._id}, (err, rank) => {
                 if (!rank) {
-                    res.json({message: "Rank not found", error: true});
+                    res.json({message: 'Rank not found', error: true});
                     return;
                 }
                 for (var i in req.body.permissions) {
@@ -214,7 +214,7 @@ module.exports = function (app) {
                     }
                 }
                 MinecraftRank.update({name: req.body._id}, {$set: {permissions: rank.permissions}}, (err) => {
-                    console.log("Removed permissions from rank " + rank.name + ": " + req.body.permissions);
+                    console.log('Removed permissions from rank ' + rank.name + ': ' + req.body.permissions);
                     res.json({rank: rank});
                 });
             });
@@ -222,7 +222,7 @@ module.exports = function (app) {
         } else if (req.body.name) {
             MinecraftRank.findOne({name: req.body.name.toLowerCase()}, (err, rank) => {
                 if (!rank) {
-                    res.json({message: "Rank not found", error: true});
+                    res.json({message: 'Rank not found', error: true});
                     return;
                 }
                 for (var i in req.body.permissions) {
@@ -233,7 +233,7 @@ module.exports = function (app) {
                 }
                 MinecraftRank.update({name: req.body.name.toLowerCase()}, {$set: {permissions: rank.permissions}}, (err) => {
                     
-                    console.log("Removed permissions from rank " + rank.name + ": " + req.body.permissions);
+                    console.log('Removed permissions from rank ' + rank.name + ': ' + req.body.permissions);
                     res.json({rank: rank});
                 });
             });
@@ -249,7 +249,7 @@ module.exports = function (app) {
      */
     app.post('/mc/player/:name/rank/add', verifyServer, (req, res) => {
         if (!req.body.rankId && !req.body.rankName) {
-            res.status(400).json({ message: "Rank not included in request.", error: true });
+            res.status(400).json({ message: 'Rank not included in request.', error: true });
             return;
         }
         var filter = {};
@@ -261,21 +261,21 @@ module.exports = function (app) {
         MinecraftUser.findOne(filter, (err, user) => {
             if (!user) {
                 console.log('player not found: ' + req.params.name);
-                res.status(401).json({ message: "Player not found", error: true });
+                res.status(401).json({ message: 'Player not found', error: true });
                 return;
             }
             if (req.body.rankId) {
                 let rankId = new mongoose.Types.ObjectId(req.body.rankId);
                 //user already has rank
                 if (user.ranks && user.ranks.indexOf(rankId) > -1) {
-                    res.status(400).json({ message: "User already has the specified rank", error: true });
+                    res.status(400).json({ message: 'User already has the specified rank', error: true });
                     return;
                 }
 
                 MinecraftRank.findOne({ _id: rankId }, (err, rank) => {
                     if (!rank) {
                         console.log('rank not found: ' + req.body.rankId);
-                        res.status(404).json({ message: "Rank not found", error: true });
+                        res.status(404).json({ message: 'Rank not found', error: true });
                         return;
                     }
 
@@ -293,13 +293,13 @@ module.exports = function (app) {
                 MinecraftRank.findOne({ name: rankName }, (err, rank) => {
                     if (!rank) {
                         console.log('rank not found: ' + rankName);
-                        res.status(404).json({ message: "Rank not found", error: true });
+                        res.status(404).json({ message: 'Rank not found', error: true });
                         return;
                     }
 
                     //user already has rank
                     if (user.ranks && user.ranks.indexOf(rank._id) > -1) {
-                        res.status(400).json({ message: "User already has the specified rank", error: true });
+                        res.status(400).json({ message: 'User already has the specified rank', error: true });
                         return;
                     }
 
@@ -308,7 +308,7 @@ module.exports = function (app) {
                     MinecraftUser.update({ _id: user._id }, {
                         $addToSet: { ranks: rank._id }
                     }, (err) => {
-                        console.log(user._id + ": " + rank._id)
+                        console.log(user._id + ': ' + rank._id)
                         console.log('Added rank ' + rank.name + ' to ' + user.name + '\'s profile.');
                         res.json({rank: rank});
                         return;
@@ -327,7 +327,7 @@ module.exports = function (app) {
      */
     app.post('/mc/player/:name/rank/remove', verifyServer, (req, res) => {
         if (!req.body.rankId && !req.body.rankName) {
-            res.status(400).json({ message: "Rank not included in request.", error: true });
+            res.status(400).json({ message: 'Rank not included in request.', error: true });
             return;
         }
 
@@ -341,7 +341,7 @@ module.exports = function (app) {
         MinecraftUser.findOne(filter, (err, user) => {
             if (!user) {
                 console.log('player not found: ' + req.params.name);
-                res.status(404).json({ message: "Player not found", error: true });
+                res.status(404).json({ message: 'Player not found', error: true });
                 return;
             }
             if (req.body.rankId) {
@@ -349,18 +349,18 @@ module.exports = function (app) {
                 MinecraftUser.findOne({ nameLower: req.params.name.toLowerCase() }, (err, user) => {
                     if (!user) {
                         console.log('player not found: ' + req.params.name);
-                        res.status(404).json({ error: "Player not found", error: true });
+                        res.status(404).json({ error: 'Player not found', error: true });
                         return;
                     }
                     MinecraftRank.findOne({ _id: rankId }, (err, rank) => {
                         /*if (!rank) {
                             console.log('rank not found: ' + req.body.rank);
-                            res.status(404).json({ message: "Rank not found", error: true });
+                            res.status(404).json({ message: 'Rank not found', error: true });
                             return;
                         }*/
                         //user already doesn't have rank
                         if (user.ranks && user.ranks.indexOf(rankId) <= -1) {
-                            res.status(400).json({ message: "User did not have the specified rank", error: true });
+                            res.status(400).json({ message: 'User did not have the specified rank', error: true });
                             return;
                         }
 
@@ -378,13 +378,13 @@ module.exports = function (app) {
                 MinecraftRank.findOne({ name: rankName }, (err, rank) => {
                     if (!rank) {
                         console.log('rank not found: ' + rankName);
-                        res.status(404).json({ message: "Rank not found", error: true });
+                        res.status(404).json({ message: 'Rank not found', error: true });
                         return;
                     }
 
                     //user already doesn't have rank
                     if (user.ranks && user.ranks.indexOf(rank._id) <= -1) {
-                        res.status(400).json({ message: "User did not have the specified rank", error: true });
+                        res.status(400).json({ message: 'User did not have the specified rank', error: true });
                         return;
                     }
 
@@ -393,7 +393,7 @@ module.exports = function (app) {
                     MinecraftUser.update({ _id: user._id }, {
                         $pull: { ranks: rank._id }
                     }, (err) => {
-                        console.log(user._id + ": " + rank._id)
+                        console.log(user._id + ': ' + rank._id)
                         console.log('Removed rank ' + rank.name + ' from ' + user.name + '\'s profile.');
                         res.json({rank: rank});
                         return;

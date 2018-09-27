@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
 var verifyServer = require('./verifyServer');
 var async = require('async');
 
@@ -104,7 +104,7 @@ module.exports = function (app) {
             MinecraftMatch
                 .find({_id: {$in: user.matches}})
                 .limit(5)
-                .sort("-finishedDate")
+                .sort('-finishedDate')
                 .exec(function(err, matches) {
                     var recentMatches = new Array();
                     async.eachSeries(matches, function(match, next) {
@@ -136,7 +136,7 @@ module.exports = function (app) {
         MinecraftMatch
             .find({})
             .limit(4)
-            .sort("-finishedDate")
+            .sort('-finishedDate')
             .exec(function(err, matches) {
                 var recentMatches = new Array();
                 async.eachSeries(matches, function(match, next) {
@@ -322,7 +322,7 @@ module.exports = function (app) {
                             async.eachSeries(match.teamMappings, function(teamMap, next) {
 
                                 async.eachSeries(teams, function(team, next) {
-                                    console.log('comparing teams: ' + team.id + " | " + teamMap.team);
+                                    console.log('comparing teams: ' + team.id + ' | ' + teamMap.team);
                                     if(team.id.toString() == teamMap.team) {
                                         //get the loaded player
                                         Common.matchPlayerWithId(playerStats, teamMap.player, function(statPlayer) {

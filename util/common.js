@@ -1,4 +1,4 @@
-var nodemailer = require("nodemailer"),
+var nodemailer = require('nodemailer'),
     crypto = require('crypto'),
     algorithm = 'aes-256-ctr';
 var async = require('async');
@@ -6,9 +6,9 @@ var async = require('async');
 var privateKey = config.key.privateKey;
 
 // create reusable transport method (opens pool of SMTP connections)
-// console.log(Config.email.username+"  "+Config.email.password);
+// console.log(Config.email.username+'  '+Config.email.password);
 var smtpTransport = nodemailer.createTransport({
-    service: "Gmail",
+    service: 'Gmail',
     auth: {
         user: config.email.username,
         pass: config.email.password
@@ -24,19 +24,19 @@ exports.encrypt = function(password) {
 };
 
 exports.sendMailVerificationLink = function(user, token) {
-    var textLink = "http://warz.one/verify/" + token;
-    var from = config.email.accountName+" Team<" + config.email.username + ">";
-    var mailbody = "<p>Thanks for Registering on " + config.email.accountName + " </p><p>Please verify your email by clicking on the verification link below.<br/><a href=" + textLink.toString()
-        + ">Verification Link</a></p>";
+    var textLink = 'http://warz.one/verify/' + token;
+    var from = config.email.accountName+' Team<' + config.email.username + '>';
+    var mailbody = '<p>Thanks for Registering on ' + config.email.accountName + ' </p><p>Please verify your email by clicking on the verification link below.<br/><a href=' + textLink.toString()
+        + '>Verification Link</a></p>';
 
-    // mail(from, user.username , "Account Verification", mailbody);
-    mail(from, "chattonluke@gmail.com" , "Account Verification", mailbody);
+    // mail(from, user.username , 'Account Verification', mailbody);
+    mail(from, 'chattonluke@gmail.com' , 'Account Verification', mailbody);
 };
 
 exports.sendMailForgotPassword = function(user) {
-    var from = config.email.accountName+" Team<" + config.email.username + ">";
-    var mailbody = "<p>Your " + config.email.accountName + "  Account Credential</p><p>username : " + user.username + " , password : " + decrypt(user.password)+"</p>"
-    mail(from, user.email , "Account password", mailbody);
+    var from = config.email.accountName+' Team<' + config.email.username + '>';
+    var mailbody = '<p>Your ' + config.email.accountName + '  Account Credential</p><p>username : ' + user.username + ' , password : ' + decrypt(user.password)+'</p>'
+    mail(from, user.email , 'Account password', mailbody);
 };
 
 
@@ -94,8 +94,8 @@ exports.toMMSS = function (sec_num) {
     var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     var seconds = Math.floor(sec_num - (hours * 3600) - (minutes * 60));
 
-    if (hours   < 10) {hours   = "0"+hours;}
-    if (minutes < 10) {minutes = "0"+minutes;}
-    if (seconds < 10) {seconds = "0"+seconds;}
+    if (hours   < 10) {hours   = '0'+hours;}
+    if (minutes < 10) {minutes = '0'+minutes;}
+    if (seconds < 10) {seconds = '0'+seconds;}
     return minutes + ':' + seconds;
 }

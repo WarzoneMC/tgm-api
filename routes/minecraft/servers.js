@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
 var MinecraftUser = mongoose.model('minecraft_user');
 var MinecraftServer = mongoose.model('minecraft_server');
 var MinecraftMap = mongoose.model('minecraft_map');
@@ -50,7 +50,7 @@ module.exports = function(app) {
                     gametype: server.gametype
                 });
             } else {
-                res.json({error: "Server not found"});
+                res.json({error: 'Server not found'});
             }
         });
     });

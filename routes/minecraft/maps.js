@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
 var MinecraftMap = mongoose.model('minecraft_map');
 var verifyServer = require('./verifyServer');
 

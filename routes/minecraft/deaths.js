@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
 var verifyServer = require('./verifyServer');
 var async = require('async');
 

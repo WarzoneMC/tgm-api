@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
 var MinecraftUser = mongoose.model('minecraft_user');
 
 module.exports = function(app) {
@@ -6,10 +6,10 @@ module.exports = function(app) {
     app.post('/forumsgg/stats', function(req, res, next) {
         if (!req.body.mcUuid) {
             console.log('Incomplete ForumsGG stat request');
-            res.json({error: true, message: "Missing field: mcUuid"});
+            res.json({error: true, message: 'Missing field: mcUuid'});
             return;
         }
-        var uuid = req.body.mcUuid.replace(/(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, "$1-$2-$3-$4-$5");
+        var uuid = req.body.mcUuid.replace(/(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, '$1-$2-$3-$4-$5');
         MinecraftUser.findOne({uuid: uuid}, function(err, user) {
             if (user) {
                 var userObj = user.toJSON()
@@ -34,17 +34,17 @@ module.exports = function(app) {
         else wlr = (wins / losses).toFixed(2);
 
         return {
-            displayType: "stat-boxes",
+            displayType: 'stat-boxes',
             statEntries: [
-                {name: "Level", value: level},
-                {name: "Matches", value: matches},
-                {name: "Monument Destroys", value: monument_destroys},
-                {name: "Kills", value: kills},
-                {name: "Deaths", value: deaths},
-                {name: "K/D", value: kdr},
-                {name: "Wins", value: wins},
-                {name: "Losses", value: losses},
-                {name: "W/L", value: wlr}
+                {name: 'Level', value: level},
+                {name: 'Matches', value: matches},
+                {name: 'Monument Destroys', value: monument_destroys},
+                {name: 'Kills', value: kills},
+                {name: 'Deaths', value: deaths},
+                {name: 'K/D', value: kdr},
+                {name: 'Wins', value: wins},
+                {name: 'Losses', value: losses},
+                {name: 'W/L', value: wlr}
             ]
         };
     }

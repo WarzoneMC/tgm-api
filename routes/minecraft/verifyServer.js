@@ -6,12 +6,12 @@ module.exports = function(req,res,next) {
         if(token === config.server.token) {
             next(); // good to go
         } else {
-            return res.json({"error": true}); //token was incorrect.
+            return res.json({'error': true}); //token was incorrect.
         }
     } else {
         // failed without token
         return res.status(403).send({
-            "error": true
+            'error': true
         });
     }
 }
