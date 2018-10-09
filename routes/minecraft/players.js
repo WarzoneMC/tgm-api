@@ -201,6 +201,10 @@ module.exports = function(app) {
                                 ip: Common.hash(req.body.ip),
                                 ip_ban: true,
                                 reverted: false
+                            }, {
+                                ip: req.body.ip,
+                                ip_ban: true,
+                                reverted: false
                             }
                         ]
                     }).sort('+issued').exec(function (err, punishes) {

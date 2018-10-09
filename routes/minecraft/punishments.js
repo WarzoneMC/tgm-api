@@ -140,7 +140,15 @@ module.exports = function(app) {
             var loadedUsers = {};
             var ids = [];
             async.eachSeries(users, function (user, next) {
-                MinecraftPunishment.find(req.body.ip ? {punished: user._id, ip: Common.hash(req.body.ip)} : {punished: user._id}).exec(function(err, punishments) {
+                MinecraftPunishment.find(req.body.ip ? {
+                    $or: [{
+                        punished: user._id
+                    }, {
+                        ip: Common.hash(req.body.ip)
+                    }, {
+                        ip: req.body.ip
+                    }]
+                } : {punished: user._id}).exec(function(err, punishments) {
                     if (err) console.log(err);
                     for (var i in punishments) {
                         var punishment = punishments[i];
