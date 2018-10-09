@@ -184,13 +184,14 @@ module.exports = function(app) {
             console.log('body: ' + JSON.stringify(req.body, null, 2));
 
             if(user) {
+                var hashedIp = Common.hash(req.body.ip);
                 var ips = user.ips;
                 if (req.body.ip) {
-                    if(ips.indexOf(Common.hash(req.body.ip)) >= 0) {
-                        ips.splice(ips.indexOf(Common.hash(req.body.ip)), 1);
+                    if(ips.indexOf(hashedIp) == -1) {
+                        ips.push(hashedIp);
                     }
-                    ips.push(Common.hash(req.body.ip));
                 }
+                ips = Common.removeDuplicates(ips);
                 MinecraftPunishment.find(
                     {
                         $or: [
@@ -198,7 +199,7 @@ module.exports = function(app) {
                                 punished: user._id,
                                 reverted: false
                             }, {
-                                ip: Common.hash(req.body.ip),
+                                ip: hashedIp,
                                 ip_ban: true,
                                 reverted: false
                             }, {

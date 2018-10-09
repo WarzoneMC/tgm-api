@@ -60,6 +60,10 @@ exports.hash = function(string) {
     return string.split('').reduce((a, b) => { a = ((a << 5) -a) + b.charCodeAt(0); return a & a; }, 0);              
 }
 
+exports.removeDuplicates = function(array) {
+    return [...new Set(array)]
+}
+
 function mail(from, email, subject, mailbody){
     var mailOptions = {
         from: from, // sender address
