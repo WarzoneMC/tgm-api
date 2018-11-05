@@ -140,7 +140,7 @@ module.exports = function(app) {
 
     app.post('/mc/player/lookup', verifyServer, function(req, res) {
         if (req.body.ip) {
-            MinecraftUser.find({ips: Common.hash(req.body.ip)}).exec((err, users) => {
+            MinecraftUser.find({ips: req.body.ip}).exec((err, users) => {
                 if (err) console.log(err);
                 var foundUsers = [];
                 for (var i in users) {
@@ -184,11 +184,10 @@ module.exports = function(app) {
             console.log('body: ' + JSON.stringify(req.body, null, 2));
 
             if(user) {
-                var hashedIp = Common.hash(req.body.ip);
                 var ips = user.ips;
                 if (req.body.ip) {
-                    if(ips.indexOf(hashedIp) == -1) {
-                        ips.push(hashedIp);
+                    if(ips.indexOf(Common.hash(req.body.ip)) >= 0) {
+                        ips.splice(ips.indexOf(Common.hash(req.body.ip)), 1);
                     }
                 }
                 ips = Common.removeDuplicates(ips);
@@ -247,7 +246,6 @@ module.exports = function(app) {
                     });
                 });
             } else {
-                var ip = Common.hash(req.body.ip);
                 user = new MinecraftUser({
                     name: req.body.name,
                     nameLower: req.body.name.toLowerCase(),
@@ -257,13 +255,13 @@ module.exports = function(app) {
                     lastOnlineDate: new Date().getTime(),
 
                     ranks: [],
-                    ips: [ip]
+                    ips: [req.body.ip]
                 });
                 user.save(function(err) {
                     if(err) {
                         console.log(err);
                     }
-                    MinecraftPunishment.find({ip: Common.hash(req.body.ip), ip_ban: true}).sort('+issued').exec(function (err, punishes) {
+                    MinecraftPunishment.find({ip: req.body.ip, ip_ban: true}).sort('+issued').exec(function (err, punishes) {
                         var punishments = new Array();
                         for (var i in punishes) {
                             var punishment = punishes[i];
