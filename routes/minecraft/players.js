@@ -16,7 +16,7 @@ module.exports = function(app) {
         MinecraftUser.find({nameLower: req.params.name.toLowerCase()}).sort('-lastOnlineDate').limit(1).exec(function(err, users) {
             var user = users[0];
             if(err) {
-                console.log(err);
+                console.error(err);
                 res.json({error: true});
             }
             if(user) {
@@ -33,7 +33,7 @@ module.exports = function(app) {
                                 .limit(10)
                                 .exec(function(err, foundDeaths) {
                                     if(err) {
-                                        console.log(err);
+                                        console.error(err);
                                     }
                                     let containing = new Array();
                                     async.eachSeries(foundDeaths, function(death, next) {
@@ -44,7 +44,7 @@ module.exports = function(app) {
                                         next();
                                     }, function(err) {
                                         MinecraftUser.find({_id: {$in: containing}}, function(err, players) {
-                                            if(err) console.log(err);
+                                            if(err) console.error(err);
 
                                             async.eachSeries(foundDeaths, function(death, next) {
 
@@ -69,6 +69,7 @@ module.exports = function(app) {
                             callback();
                         }
                     },
+                    // Fill in matches
                     function(callback) {
                         if (true) {
                             MinecraftMatch
@@ -76,10 +77,28 @@ module.exports = function(app) {
                                 .sort('-finishedDate')
                                 .limit(10)
                                 .exec(function(err, foundMatches) {
-                                    if(err) console.log(err);
+                                    if(err) console.error(err);
                                     matches = foundMatches;
                                     callback();
                                 })
+                        } else {
+                            callback();
+                        }
+                    },
+                    // Hash un-hashed ips
+                    function(callback) {
+                        var fixed = false;
+                        for (var i in user.ips) {
+                            if (user.ips[i].includes('.')) {
+                                fixed = true;
+                                user.ips[i] = Common.hash(user.ips[i]);
+                            }
+                        }
+                        if (fixed) {
+                            user.save(function (err, doc, n) {
+                                if (err) console.error(err);
+                                callback();
+                            });
                         } else {
                             callback();
                         }
@@ -105,7 +124,7 @@ module.exports = function(app) {
             .limit(4)
             .exec(function(err, foundDeaths) {
                 if(err) {
-                    console.log(err);
+                    console.error(err);
                 }
                 let containing = new Array();
                 async.eachSeries(foundDeaths, function(death, next) {
@@ -116,7 +135,7 @@ module.exports = function(app) {
                     next();
                 }, function(err) {
                     MinecraftUser.find({_id: {$in: containing}}, function(err, players) {
-                        if(err) console.log(err);
+                        if(err) console.error(err);
 
                         async.eachSeries(foundDeaths, function(death, next) {
 
@@ -141,7 +160,7 @@ module.exports = function(app) {
     app.post('/mc/player/lookup', verifyServer, function(req, res) {
         if (req.body.ip) {
             MinecraftUser.find({$or:[{ ips: Common.hash(req.body.ip) }, { ips: req.body.ip }]}).exec((err, users) => {
-                if (err) console.log(err);
+                if (err) console.error(err);
                 var foundUsers = [];
                 for (var i in users) {
                     var json = users[i].toFullJSON();
@@ -155,7 +174,7 @@ module.exports = function(app) {
             });
         } else if (req.body.name) {
             MinecraftUser.find({nameLower: req.body.name.toLowerCase()}).exec((err, users) => {
-                if (err) console.log(err);
+                if (err) console.error(err);
                 var foundUsers = [];
                 for (var i in users) {
                     var json = users[i].toFullJSON();
@@ -173,6 +192,44 @@ module.exports = function(app) {
                 message: 'Query filter not included in the request.'
             });
         }
+    });
+
+    app.get('/mc/player/alts/:name', async function(req, res) {
+        MinecraftUser.find({nameLower: req.params.name.toLowerCase()}).sort('-lastOnlineDate').limit(1).exec(async function(err, users) {
+            if (err) console.error(err);
+            var user = users[0];
+            if (!user) {
+                return res.json({
+                    error: true,
+                    message: "Player not found"
+                });
+            }
+            var fixed = false;
+            for (var i in user.ips) {
+                if (user.ips[i].includes('.')) {
+                    fixed = true;
+                    user.ips[i] = Common.hash(user.ips[i]);
+                }
+            }
+            if (fixed) {
+                await user.save();
+            }
+            MinecraftUser.find({ips: { $in: user.ips }}).exec(function(err, users) {
+                if (err) console.error(err);
+                var cleanUsers = [];
+                for (var i in users) {
+                    if (users[i].uuid !== user.uuid) {
+                        var json = users[i].toFullJSON();
+                        delete json.matches;
+                        cleanUsers.push(json);
+                    }
+                }
+                res.json({
+                    lookupUser: user,
+                    users: cleanUsers
+                });
+            });
+        });        
     });
 
     app.post('/mc/player/login', verifyServer, function(req, res) {
@@ -209,7 +266,7 @@ module.exports = function(app) {
                             }
                         ]
                     }).sort('+issued').exec(function (err, punishes) {
-                    if (err) console.log(err);
+                    if (err) console.error(err);
                     var isBanned = false;
                     var punishments = new Array();
                     for (var i in punishes) {
@@ -235,10 +292,10 @@ module.exports = function(app) {
                         query.lastOnlineDate = Date.now();
                     }
                     MinecraftUser.update({uuid: req.body.uuid}, {$set: query}, function(err) {
-                        if (err) console.log(err);
+                        if (err) console.error(err);
                         user.punishments = punishments;
                         MinecraftRank.find({ _id: { $in: user.ranks } }, (err, ranks) => {
-                            if (err) console.log(err);
+                            if (err) console.error(err);
                             user.ranksLoaded = ranks;
                             res.json(user);
                             console.log('user: ' + JSON.stringify(user, null, 2));
@@ -261,7 +318,7 @@ module.exports = function(app) {
                 });
                 user.save(function(err) {
                     if(err) {
-                        console.log(err);
+                        console.error(err);
                     }
                     MinecraftPunishment.find({ip: Common.hash(req.body.ip), ip_ban: true}).sort('+issued').exec(function (err, punishes) {
                         var punishments = new Array();
