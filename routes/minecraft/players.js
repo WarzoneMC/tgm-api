@@ -207,10 +207,12 @@ module.exports = function(app) {
                 });
             }
             var fixed = false;
-            for (var i in user.ips) {
-                if (user.ips[i].includes('.')) {
-                    fixed = true;
-                    user.ips[i] = Common.hash(user.ips[i]);
+            if (user.ips) {
+                for (var i in user.ips) {
+                    if (user.ips[i] && typeof user.ips[i] === 'string' && user.ips[i].includes('.')) {
+                        fixed = true;
+                        user.ips[i] = Common.hash(user.ips[i]);
+                    }
                 }
             }
             if (fixed) {
