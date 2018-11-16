@@ -140,7 +140,7 @@ module.exports = function(app) {
 
     app.post('/mc/player/lookup', verifyServer, function(req, res) {
         if (req.body.ip) {
-            MinecraftUser.find({ips: Common.hash(req.body.ip)}).exec((err, users) => {
+            MinecraftUser.find({$or:[{ ips: Common.hash(req.body.ip) }, { ips: req.body.ip }]}).exec((err, users) => {
                 if (err) console.log(err);
                 var foundUsers = [];
                 for (var i in users) {
