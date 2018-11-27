@@ -6,8 +6,7 @@ module.exports = function(app) {
     app.post('/forumsgg/stats', function(req, res, next) {
         if (!req.body.mcUuid) {
             console.log('Incomplete ForumsGG stat request');
-            res.json({error: true, message: 'Missing field: mcUuid'});
-            return;
+            return res.json({error: true, message: 'Missing field: mcUuid'});
         }
         var uuid = req.body.mcUuid.replace(/(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, '$1-$2-$3-$4-$5');
         MinecraftUser.findOne({uuid: uuid}, function(err, user) {
