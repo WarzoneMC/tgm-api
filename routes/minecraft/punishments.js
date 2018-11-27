@@ -127,13 +127,11 @@ module.exports = function(app) {
         if (req.body.ip) result = MinecraftUser.find({ips: Common.hash(req.body.ip)});
         else if (req.body.name) result = MinecraftUser.find({nameLower: req.body.name.toLowerCase()}).sort('-lastOnlineDate').limit(1);
         else {
-            res.json({notFound: true});
-            return;
+            return res.json({notFound: true});
         }
         result.exec(function(err, users) {
             if (users.length == 0) {
-                res.json({notFound: true});
-                return;
+                return res.json({notFound: true});
             }
             if (err) console.log(err);
             var loadedPunishments = [];
