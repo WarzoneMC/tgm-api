@@ -167,6 +167,7 @@ module.exports = function(app) {
                 for (var i in users) {
                     var json = users[i].toFullJSON();
                     delete json.matches;
+                    delete json.ips;
                     foundUsers.push(json);
                 }
                 res.json({
@@ -181,6 +182,7 @@ module.exports = function(app) {
                 for (var i in users) {
                     var json = users[i].toFullJSON();
                     delete json.matches;
+                    delete json.ips;
                     foundUsers.push(json);
                 }
                 res.json({
@@ -218,6 +220,9 @@ module.exports = function(app) {
             if (fixed) {
                 await user.save();
             }
+            var lookupUser = user.toFullJSON();
+            delete lookupUser.matches;
+            delete lookupUser.ips;
             MinecraftUser.find({ips: { $in: user.ips }}).exec(function(err, users) {
                 if (err) console.error(err);
                 var cleanUsers = [];
@@ -225,11 +230,12 @@ module.exports = function(app) {
                     if (users[i].uuid !== user.uuid) {
                         var json = users[i].toFullJSON();
                         delete json.matches;
+                        delete json.ips;
                         cleanUsers.push(json);
                     }
                 }
                 res.json({
-                    lookupUser: user,
+                    lookupUser: lookupUser,
                     users: cleanUsers
                 });
             });
