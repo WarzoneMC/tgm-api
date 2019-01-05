@@ -14,5 +14,17 @@ module.exports = function(app) {
                 res.json(users);
             })
     });
+    
+    app.get('/mc/leaderboard/xp', function(req, res, next) {
+        MinecraftUser
+            .find({})
+            .sort('-xp')
+            .limit(25)
+            .exec(function(err, users) {
+               if(err) console.log(err);
+
+                res.json(users);
+            })
+    });
 
 }
