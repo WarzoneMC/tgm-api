@@ -63,6 +63,7 @@ var MinecraftUser = new Schema({
     deaths                  : Number,
     wins                    : Number,
     losses                  : Number,
+    firstBloods             : Number,
     matches                 : [ObjectId],
     
     wool_destroys           : Number,

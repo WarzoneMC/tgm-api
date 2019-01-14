@@ -99,6 +99,11 @@ module.exports = function(app) {
                     MinecraftUser.update({_id: death.killer}, {$inc: {kills: 1}}, function(err3) {
                         if(err3) console.log(err3);
                     });
+                    if(req.body.firstBlood) {
+                        MinecraftUser.update({_id: death.killer}, {$inc: {firstBloods: 1}}, function(err4) {
+                            if(err4) console.log(err4);
+                        });
+                    }
                 }
 
                 res.json({});
