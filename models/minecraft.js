@@ -68,15 +68,21 @@ var MinecraftUser = new Schema({
     wool_destroys           : Number,
     punishments             : [MinecraftPunishment]
 });
-MinecraftUser.methods.toJSON = function() {
-    let obj = this.toObject();
+function toJSON(obj, c) {
+    if (c) obj = obj.toObject();
     delete obj.password;
     delete obj.ips;
     obj.level = parseInt(0.6 * Math.sqrt(((obj.wins ? obj.wins : 0) * 10) + ((obj.losses ? obj.losses : 0) * 5) + ((obj.wool_destroys ? obj.wool_destroys : 0) * 3) + ((obj.kills ? obj.kills : 0) * 2)), 10) + 1
     obj.levelRaw = 0.6 * Math.sqrt(((obj.wins ? obj.wins : 0) * 10) + ((obj.losses ? obj.losses : 0) * 5) + ((obj.wool_destroys ? obj.wool_destroys : 0) * 3) + ((obj.kills ? obj.kills : 0) * 2)) + 1
     obj.xp = ((obj.wins ? obj.wins : 0) * 10) + ((obj.losses ? obj.losses : 0) * 5) + ((obj.wool_destroys ? obj.wool_destroys : 0) * 3) + ((obj.kills ? obj.kills : 0) * 2);
     return obj;
-};
+}
+
+MinecraftUser.statics.toJSON = toJSON;
+
+MinecraftUser.methods.toJSON = function() {
+    return toJSON(this, true);
+}
 
 MinecraftUser.methods.toFullJSON = function() {
     let obj = this.toObject();
