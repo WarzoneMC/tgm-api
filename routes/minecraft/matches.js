@@ -21,9 +21,9 @@ module.exports = function (app) {
     })
 
     /**
-     * Increments user's wool break count by 1.
+     * Increments user's wool placement count by 1.
      *
-     * Called when user breaks a wool mid-match.
+     * Called when user places a wool mid-match.
      */
     app.post('/mc/match/place_wool', verifyServer, (req, res) => {
         MinecraftUser.update({ uuid: req.body.uuid }, { $inc: { wool_placements: 1 } }, (err) => {
