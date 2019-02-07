@@ -21,6 +21,17 @@ module.exports = function (app) {
     })
 
     /**
+     * Increments user's wool pickup count by 1.
+     *
+     * Called when user picks up a wool mid-match.
+     */
+    app.post('/mc/match/wool_pickup', verifyServer, (req, res) => {
+        MinecraftUser.update({ uuid: req.body.uuid }, { $inc: { wool_pickups: 1 } }, (err) => {
+            res.json({});
+        })
+    })
+
+    /**
      * body: MatchLoadRequest.java
      */
     app.post('/mc/match/load', verifyServer, function(req, res) {
