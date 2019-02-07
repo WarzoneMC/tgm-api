@@ -53,6 +53,7 @@ var MinecraftUser = new Schema({
 
     initialJoinDate         : Number,
     lastOnlineDate          : Number,
+    totalPlaytime           : Number,
 
     ranks                   : [ObjectId],
     ips                     : [String],

@@ -242,6 +242,32 @@ module.exports = function(app) {
         });        
     });
 
+    app.post('/mc/player/logout', verifyServer, function(req, res) {
+        console.log('logout request');
+        MinecraftUser.findOne({
+            uuid: req.body.uuid
+        }).lean().exec(function(err, user) {
+            if (err) throw err;
+            console.log('body: ' + JSON.stringify(req.body, null, 2));
+
+            if (user) {
+                var query = {};
+
+                if (user.totalPlaytime) {
+                    query.totalPlaytime = user.totalPlaytime + (Date.now() - user.lastOnlineDate);
+                } else {
+                    query.totalPlaytime = (Date.now() - user.lastOnlineDate);
+                }
+
+                MinecraftUser.update({uuid: req.body.uuid}, {$set: query}, function(err) {
+                    if (err) console.error(err);
+                    console.log('Minecraft User logout: ' + user.name);
+                    res.json({});
+                });
+            }
+        });
+    });
+
     app.post('/mc/player/login', verifyServer, function(req, res) {
         console.log('login request');
         MinecraftUser.findOne({
@@ -322,6 +348,7 @@ module.exports = function(app) {
 
                     initialJoinDate: new Date().getTime(),
                     lastOnlineDate: new Date().getTime(),
+                    totalPlaytime: 0,
 
                     ranks: [],
                     ips: [ip]
