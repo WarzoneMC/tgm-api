@@ -66,14 +66,15 @@ var MinecraftUser = new Schema({
     matches                 : [ObjectId],
     
     wool_destroys           : Number,
+    wool_placements         : Number,
     punishments             : [MinecraftPunishment]
 });
 function toJSON(obj, c) {
     if (c) obj = obj.toObject();
     delete obj.password;
     delete obj.ips;
-    obj.level = parseInt(0.6 * Math.sqrt(((obj.wins ? obj.wins : 0) * 10) + ((obj.losses ? obj.losses : 0) * 5) + ((obj.wool_destroys ? obj.wool_destroys : 0) * 3) + ((obj.kills ? obj.kills : 0) * 2)), 10) + 1
-    obj.levelRaw = 0.6 * Math.sqrt(((obj.wins ? obj.wins : 0) * 10) + ((obj.losses ? obj.losses : 0) * 5) + ((obj.wool_destroys ? obj.wool_destroys : 0) * 3) + ((obj.kills ? obj.kills : 0) * 2)) + 1
+    obj.level = parseInt(0.6 * Math.sqrt(((obj.wins ? obj.wins : 0) * 10) + ((obj.losses ? obj.losses : 0) * 5) + ((obj.wool_destroys ? obj.wool_destroys : 0) * 3) + ((obj.wool_placements ? obj.wool_placements : 0) * 12) + ((obj.kills ? obj.kills : 0) * 2)), 10) + 1
+    obj.levelRaw = 0.6 * Math.sqrt(((obj.wins ? obj.wins : 0) * 10) + ((obj.losses ? obj.losses : 0) * 5) + ((obj.wool_destroys ? obj.wool_destroys : 0) * 3) + ((obj.wool_placements ? obj.wool_placements : 0) * 12) + ((obj.kills ? obj.kills : 0) * 2)) + 1
     obj.xp = ((obj.wins ? obj.wins : 0) * 10) + ((obj.losses ? obj.losses : 0) * 5) + ((obj.wool_destroys ? obj.wool_destroys : 0) * 3) + ((obj.kills ? obj.kills : 0) * 2);
     return obj;
 }
