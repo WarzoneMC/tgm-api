@@ -27,7 +27,7 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/mc/player/:name/ranks', verifyServer, (req, res) => {
+    app.get('/mc/player/:name/ranks', (req, res) => {
         MinecraftUser.find({ nameLower: req.params.name.toLowerCase() }).sort('-lastOnlineDate').limit(1).exec((err, users) => {
             var user = users[0];
             if (!user) {
