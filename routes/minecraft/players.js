@@ -251,7 +251,7 @@ module.exports = function(app) {
             console.log('body: ' + JSON.stringify(req.body, null, 2));
 
             if(user) {
-                user.matches = [];
+                delete user.matches;
                 var hashedIp = Common.hash(req.body.ip);
                 var ips = user.ips;
                 if (req.body.ip) {
