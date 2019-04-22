@@ -248,7 +248,7 @@ module.exports = function(app) {
             uuid: req.body.uuid
         }).lean().exec(function(err, user) {
             if(err) throw err;
-            delete user.matches; //matches array gets really big and slows everything down
+            user.matches = []; //matches array gets really big and slows everything down
             console.log('body: ' + JSON.stringify(req.body, null, 2));
 
             if(user) {
