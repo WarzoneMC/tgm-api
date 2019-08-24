@@ -1,9 +1,21 @@
 {
   "name": "warzone-api",
   "version": "2.0.0",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "repository": "git@github.com:WarzoneMC/api",
   "author": "Daniel Gulic <danielgulic@gmail.com>",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "helmet": "^3.20.0",
+    "joi": "^14.3.1",
+    "morgan": "^1.9.1",
+    "rethinkdbdash": "^2.3.31"
+	},
+	"scripts": {
+		"start": "node src/server.js"
+	}
 }
