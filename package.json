@@ -1,0 +1,9 @@
+{
+  "name": "warzone-api",
+  "version": "2.0.0",
+  "main": "src/index.js",
+  "repository": "git@github.com:WarzoneMC/api",
+  "author": "Daniel Gulic <danielgulic@gmail.com>",
+  "license": "MIT",
+  "private": true
+}
