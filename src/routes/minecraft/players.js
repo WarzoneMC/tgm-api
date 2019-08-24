@@ -53,6 +53,8 @@ router.post('/login', isAuthenticated, async (req, res) => {
 
 		// Filter punishments table for player and respond with them - punishments is not stored on player object in db!
 		player.punishments = [];
+		// Same with deaths
+		player.deaths = 0;
 
 		console.log('player login', player);
 		res.json({ ok: true, new: false, player });
@@ -67,7 +69,6 @@ router.post('/login', isAuthenticated, async (req, res) => {
 			ips: [simpleHash(req.body.ip)],
 			ranks: [],
 			matches: [],
-			deaths: 0,
 			wins: 0,
 			kills: 0,
 			woolDestroys: 0
@@ -80,6 +81,8 @@ router.post('/login', isAuthenticated, async (req, res) => {
 
 		// Filter punishments table for player and respond with them - punishments is not stored on player object in db!
 		player.punishments = [];
+		// Same with deaths
+		player.deaths = 0;
 
 		console.log('new player login', player);
 		res.status(201).json({ ok: true, new: true, player });
