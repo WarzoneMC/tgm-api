@@ -1,7 +1,7 @@
-const Joi = require('joi');
-const { USERNAME_REGEX } = require('../constants');
+import * as Joi from 'joi';
+import { USERNAME_REGEX } from '../constants';
 
-module.exports = Joi.object()
+export default Joi.object()
 	.keys({
 		name: Joi.string()
 			.regex(USERNAME_REGEX)

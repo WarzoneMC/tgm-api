@@ -1,14 +1,16 @@
-const express = require('express');
-const router = (module.exports = express.Router());
-const { r } = require('../../server');
-const { isAuthenticated, handleJoi, simpleHash } = require('../../util');
-const schemas = require('../../schemas');
+import * as express from 'express';
+import { Request, Response } from 'express';
+import { r } from '../../server';
+import { isAuthenticated, handleJoi, simpleHash } from '../../util';
+import schemas from '../../schemas';
 
-router.post('/login', isAuthenticated, async (req, res) => {
+const router = express.Router();
+
+router.post('/login', isAuthenticated, async (req: Request, res: Response) => {
 	// When player joins
 	if (!handleJoi(schemas.playerLogin, req, res)) return;
 
-	const uuid = req.body.uuid;
+	const uuid: string = req.body.uuid;
 
 	let player = await r
 		.table('players')
@@ -88,3 +90,5 @@ router.post('/login', isAuthenticated, async (req, res) => {
 		res.status(201).json({ ok: true, new: true, player });
 	}
 });
+
+export default router;

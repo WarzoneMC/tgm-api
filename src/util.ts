@@ -1,6 +1,8 @@
-const Joi = require('joi');
+import * as Joi from 'joi';
+import { Schema } from 'joi';
+import { Request, Response } from 'express';
 
-exports.isAuthenticated = (req, res, next) => {
+export const isAuthenticated = (req: Request, res: Response, next) => {
 	if (
 		!req.headers.authorization ||
 		req.headers.authorization.split(' ')[1] !== process.env.ACCESS_TOKEN
@@ -9,7 +11,7 @@ exports.isAuthenticated = (req, res, next) => {
 	next();
 };
 
-exports.handleJoi = (schema, req, res) => {
+export const handleJoi = (schema: Schema, req: Request, res: Response) => {
 	let result = Joi.validate(req.body, schema);
 	if (result.error) {
 		if (!result.error.isJoi) {
@@ -32,8 +34,8 @@ exports.handleJoi = (schema, req, res) => {
  some light security. You should not use this for sensitive data!! 
  It may be reversible. ~jellz
  */
-exports.simpleHash = (string) => {
-	return string.split('').reduce((a, b) => {
+export const simpleHash = (str: string) => {
+	return str.split('').reduce((a, b) => {
 		a = (a << 5) - a + b.charCodeAt(0);
 		return a & a;
 	}, 0);
