@@ -147,7 +147,10 @@ let MinecraftMap = new Schema({
     name            : String,
     nameLower       : String,
     version         : String,
-    authors         : [String],
+    authors         : [{
+        uuid: String,
+        username: String
+    }],
     gametype        : String,
     thumbnail       : String,
     images          : [String],
