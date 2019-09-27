@@ -2,13 +2,13 @@ import * as express from 'express';
 import { Request, Response } from 'express';
 import { r } from '../../server';
 import { isAuthenticated, handleJoi, simpleHash } from '../../util';
-import schemas from '../../schemas';
+import playerLogin from '../../schemas/request/playerLogin';
 
 const router = express.Router();
 
 router.post('/login', isAuthenticated, async (req: Request, res: Response) => {
 	// When player joins
-	if (!handleJoi(schemas.playerLogin, req, res)) return;
+	if (!handleJoi(playerLogin, req, res)) return;
 
 	const uuid: string = req.body.uuid;
 

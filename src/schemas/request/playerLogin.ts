@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { USERNAME_REGEX } from '../constants';
+import { USERNAME_REGEX } from '../../constants';
 
 export default Joi.object()
 	.keys({
