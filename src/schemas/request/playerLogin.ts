@@ -6,7 +6,7 @@ export default Joi.object()
 		name: Joi.string()
 			.regex(USERNAME_REGEX)
 			.required(),
-		uuid: Joi.string()
+		id: Joi.string()
 			.uuid()
 			.required(),
 		ip: Joi.string()

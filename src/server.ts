@@ -1,13 +1,16 @@
 require('dotenv').config();
 
 import * as express from 'express';
-import * as rethinkdbdash from 'rethinkdbdash';
 import * as morgan from 'morgan';
 import * as helmet from 'helmet';
 import * as cors from 'cors';
+import * as mongoose from 'mongoose';
 
 const app = express();
-export const r = rethinkdbdash({ db: process.env.DATABASE_NAME || 'warzone' });
+mongoose.connect(process.env.MONGO_URI || `mongodb://localhost:27017/warzone`, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true
+});
 
 app.use(helmet());
 app.use(cors());
