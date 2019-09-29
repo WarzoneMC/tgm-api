@@ -93,7 +93,10 @@ MinecraftUser.methods.toFullJSON = function() {
 };
 
 MinecraftUser.methods.loadRanks = function (callback) {
-    MinecraftRank.find({ _id: { $in: this.ranks } }, (err, ranks) => {
+    MinecraftRank.find({$or: [
+        { _id: { $in: this.ranks } },
+        { default: true }
+    ]}, (err, ranks) => {
         if (err) console.log(err);
         
         callback(ranks);
@@ -106,7 +109,8 @@ let MinecraftRank = new Schema({
     priority            : Number,
     prefix              : String,
     permissions         : [String],
-    staff               : Boolean
+    staff               : Boolean,
+    default             : Boolean
 });
 mongoose.model('minecraft_rank', MinecraftRank);
 

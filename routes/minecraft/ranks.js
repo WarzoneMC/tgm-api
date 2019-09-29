@@ -34,7 +34,10 @@ module.exports = function (app) {
                 res.status(404).json({ notFound: true });
                 return;
             }
-            MinecraftRank.find({ _id: { $in: user.ranks }}, (err, ranks) => {
+            MinecraftRank.find({$or: [
+                { _id: { $in: user.ranks }},
+                { default: true }
+            ]}, (err, ranks) => {
                 res.json(ranks);
             });
         });
@@ -50,7 +53,8 @@ module.exports = function (app) {
             priority: req.body.priority,
             prefix: req.body.prefix,
             permissions: req.body.permissions,
-            staff: req.body.staff
+            staff: req.body.staff,
+            default: req.body.default
         });
         rank.save(function(err) {
             if(err) {
@@ -108,6 +112,7 @@ module.exports = function (app) {
                 if (req.params.field == 'priority') update.priority = req.body.value;
                 if (req.params.field == 'permissions') update.permissions = req.body.value;
                 if (req.params.field == 'staff') update.staff = req.body.value;
+                if (req.params.field == 'default') update.default = req.body.value;
 
                 console.log(update);
                 
@@ -128,6 +133,7 @@ module.exports = function (app) {
                 if (req.params.field == 'priority') update.priority = req.body.value;
                 if (req.params.field == 'permissions') update.permissions = req.body.value;
                 if (req.params.field == 'staff') update.staff = req.body.value;
+                if (req.params.field == 'default') update.default = req.body.value;
 
                 console.log(update);
 
@@ -266,16 +272,17 @@ module.exports = function (app) {
             }
             if (req.body.rankId) {
                 let rankId = new mongoose.Types.ObjectId(req.body.rankId);
-                //user already has rank
-                if (user.ranks && user.ranks.indexOf(rankId) > -1) {
-                    res.status(400).json({ message: 'User already has the specified rank', error: true });
-                    return;
-                }
-
+                
                 MinecraftRank.findOne({ _id: rankId }, (err, rank) => {
                     if (!rank) {
                         console.log('rank not found: ' + req.body.rankId);
                         res.status(404).json({ message: 'Rank not found', error: true });
+                        return;
+                    }
+                    
+                    //user already has rank
+                    if (rank.default || user.ranks && user.ranks.indexOf(rankId) > -1) {
+                        res.status(400).json({ message: 'User already has the specified rank', error: true });
                         return;
                     }
 
@@ -298,7 +305,7 @@ module.exports = function (app) {
                     }
 
                     //user already has rank
-                    if (user.ranks && user.ranks.indexOf(rank._id) > -1) {
+                    if (rank.default || user.ranks && user.ranks.indexOf(rank._id) > -1) {
                         res.status(400).json({ message: 'User already has the specified rank', error: true });
                         return;
                     }
@@ -358,6 +365,12 @@ module.exports = function (app) {
                             res.status(404).json({ message: 'Rank not found', error: true });
                             return;
                         }*/
+                        
+                        if (rank && rank.default) {
+                            res.status(400).json({ message: 'Cannot remove a default rank.', error: true });
+                            return;
+                        }
+                        
                         //user already doesn't have rank
                         if (user.ranks && user.ranks.indexOf(rankId) <= -1) {
                             res.status(400).json({ message: 'User did not have the specified rank', error: true });
@@ -379,6 +392,11 @@ module.exports = function (app) {
                     if (!rank) {
                         console.log('rank not found: ' + rankName);
                         res.status(404).json({ message: 'Rank not found', error: true });
+                        return;
+                    }
+
+                    if (rank.default) {
+                        res.status(400).json({ message: 'Cannot remove a default rank.', error: true });
                         return;
                     }
 

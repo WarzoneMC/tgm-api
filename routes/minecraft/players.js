@@ -305,7 +305,10 @@ module.exports = function(app) {
                     MinecraftUser.update({uuid: req.body.uuid}, {$set: query}, function(err) {
                         if (err) console.error(err);
                         user.punishments = punishments;
-                        MinecraftRank.find({ _id: { $in: user.ranks } }, (err, ranks) => {
+                        MinecraftRank.find({$or: [
+                            { _id: { $in: user.ranks } },
+                            { default: true }
+                        ]}, (err, ranks) => {
                             if (err) console.error(err);
                             user.ranksLoaded = ranks;
                             res.json(user);
