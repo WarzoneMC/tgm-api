@@ -23,7 +23,7 @@ export const handleJoi = (schema: Schema, req: Request, res: Response) => {
 		}
 		res.status(400).json({
 			ok: false,
-			error: result.error.details.map((item) => item.message)[0]
+			error: result.error.details.map(item => item.message)[0]
 		});
 		return false;
 	} else return true;

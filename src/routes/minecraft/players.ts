@@ -19,11 +19,15 @@ router.post('/login', isAuthenticated, async (req: Request, res: Response) => {
 		if (!ips.includes(simpleHash(req.body.ip)))
 			ips.push(simpleHash(req.body.ip));
 
-		player = await PlayerModel.findByIdAndUpdate(uuid, {
-			ips,
-			name: req.body.name,
-			lastJoinDate: Date.now()
-		}, { new: true });
+		player = await PlayerModel.findByIdAndUpdate(
+			uuid,
+			{
+				ips,
+				name: req.body.name,
+				lastJoinDate: Date.now()
+			},
+			{ new: true }
+		);
 
 		// Filter punishments table for player and respond with them - punishments is not stored on player doc in db!
 		// @ts-ignore

@@ -3,7 +3,7 @@ import { prop, Typegoose, ModelType, InstanceType } from '@hasezoey/typegoose';
 class Player extends Typegoose {
 	@prop({ required: true })
 	_id!: string;
-	
+
 	@prop({ required: true })
 	name!: string;
 
