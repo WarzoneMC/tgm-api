@@ -5,12 +5,14 @@ module.exports = function(app) {
 
     app.get('/mc/leaderboard/kills', function(req, res, next) {
         var limit;
-        try {
-            limit = parseInt(req.query.limit);
-            if (limit > 25) limit = 25;
-        } catch (err) {
-            limit = 25;
-        }
+        if (req.query.limit) {
+            try {
+                limit = parseInt(req.query.limit);
+                if (limit > 25) limit = 25;
+            } catch (err) {
+                limit = 25;
+            }
+        } else limit = 25;
         MinecraftUser
             .find({})
             .sort('-kills')
@@ -24,12 +26,14 @@ module.exports = function(app) {
     
     app.get('/mc/leaderboard/xp', function(req, res, next) {
         var limit;
-        try {
-            limit = parseInt(req.query.limit);
-            if (limit > 25) limit = 25;
-        } catch (err) {
-            limit = 25;
-        }
+        if (req.query.limit) {
+            try {
+                limit = parseInt(req.query.limit);
+                if (limit > 25) limit = 25;
+            } catch (err) {
+                limit = 25;
+            }
+        } else limit = 25;
         MinecraftUser.aggregate([{
             $addFields: {
                 xp: {
@@ -56,12 +60,14 @@ module.exports = function(app) {
 
     app.get('/mc/leaderboard/wins', function(req, res, next) {
         var limit;
-        try {
-            limit = parseInt(req.query.limit);
-            if (limit > 25) limit = 25;
-        } catch (err) {
-            limit = 25;
-        }
+        if (req.query.limit) {
+            try {
+                limit = parseInt(req.query.limit);
+                if (limit > 25) limit = 25;
+            } catch (err) {
+                limit = 25;
+            }
+        } else limit = 25;
         MinecraftUser
             .find({})
             .sort('-wins')
