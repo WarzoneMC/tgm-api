@@ -13,7 +13,13 @@ var MinecraftPunishment = mongoose.model('minecraft_punishment');
 module.exports = function(app) {
 
     app.get('/mc/player/:name', function(req, res, next) {
-        MinecraftUser.find({nameLower: req.params.name.toLowerCase()}).sort('-lastOnlineDate').limit(1).exec(function(err, users) {
+        var query;
+        if (req.query.byUUID) {
+            query = {uuid: req.params.name}
+        } else {
+            query = {nameLower: req.params.name.toLowerCase()};
+        }
+        MinecraftUser.find(query).sort('-lastOnlineDate').limit(1).exec(function(err, users) {
             var user = users[0];
             if(err) {
                 console.error(err);

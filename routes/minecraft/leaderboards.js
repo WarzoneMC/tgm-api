@@ -4,10 +4,17 @@ var MinecraftUser = mongoose.model('minecraft_user');
 module.exports = function(app) {
 
     app.get('/mc/leaderboard/kills', function(req, res, next) {
+        var limit;
+        try {
+            limit = parseInt(req.query.limit);
+            if (limit > 25) limit = 25;
+        } catch (err) {
+            limit = 25;
+        }
         MinecraftUser
             .find({})
             .sort('-kills')
-            .limit(25)
+            .limit(limit)
             .exec(function(err, users) {
                if(err) console.log(err);
 
@@ -16,6 +23,13 @@ module.exports = function(app) {
     });
     
     app.get('/mc/leaderboard/xp', function(req, res, next) {
+        var limit;
+        try {
+            limit = parseInt(req.query.limit);
+            if (limit > 25) limit = 25;
+        } catch (err) {
+            limit = 25;
+        }
         MinecraftUser.aggregate([{
             $addFields: {
                 xp: {
@@ -29,7 +43,7 @@ module.exports = function(app) {
             }
         }])
         .sort('-xp')
-        .limit(25)
+        .limit(limit)
         .exec(function(err, users) {
             if(err) console.log(err);
             console.log(users);
@@ -41,10 +55,17 @@ module.exports = function(app) {
     });
 
     app.get('/mc/leaderboard/wins', function(req, res, next) {
+        var limit;
+        try {
+            limit = parseInt(req.query.limit);
+            if (limit > 25) limit = 25;
+        } catch (err) {
+            limit = 25;
+        }
         MinecraftUser
             .find({})
             .sort('-wins')
-            .limit(25)
+            .limit(limit)
             .exec(function(err, users) {
                if(err) console.log(err);
 
