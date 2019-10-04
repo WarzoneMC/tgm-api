@@ -31,7 +31,7 @@ module.exports = function(app) {
 
     app.get('/mc/server/:id', function(req, res) {
         MinecraftServer.findOne({
-            id: req.params.id
+            id: req.params.id.toLowerCase()
         }, function(err, server) {
             if (server) {
                 res.json({
@@ -96,6 +96,7 @@ module.exports = function(app) {
 
             var data = {
                 name: req.body.name,
+                motd: req.body.motd,
                 nameLower: req.body.name.toLowerCase(),
                 id: req.body.id,
                 lastOnline: new Date().getTime(),

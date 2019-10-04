@@ -116,6 +116,7 @@ mongoose.model('minecraft_rank', MinecraftRank);
 
 var MinecraftServer = new Schema({
     name                : String,
+    motd                : String,
     nameLower           : String,
     id                  : String,
 
