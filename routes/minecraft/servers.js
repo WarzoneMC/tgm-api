@@ -29,15 +29,16 @@ module.exports = function(app) {
         })
     })
 
-    app.post('/mc/server/stats', function(req, res) {
+    app.get('/mc/server/:id', function(req, res) {
         MinecraftServer.findOne({
-            name: req.body.name
+            id: req.params.id
         }, function(err, server) {
             if (server) {
                 res.json({
                     _id: server._id,
-                    name: 'Warzone',
-                    motd: 'Warzone - A Minehut hosted PvP server!',
+                    id: server.id,
+                    name: server.name,
+                    motd: server.motd,
                     
                     players: server.playerNames,
                     playerCount: server.playerCount,
@@ -51,6 +52,36 @@ module.exports = function(app) {
                 });
             } else {
                 res.json({error: 'Server not found'});
+            }
+        });
+    });
+
+    app.get('/mc/servers', function(req, res) {
+        MinecraftServer.find({}, function(err, servers) {
+            if (servers) {
+                var found = [];
+                for (var i in servers) {
+                    var server = servers[i];
+                    found.push({
+                        _id: server._id,
+                        id: server.id,
+                        name: server.name,
+                        motd: server.motd,
+                        
+                        players: server.playerNames,
+                        playerCount: server.playerCount,
+                        spectatorCount: server.spectatorCount,
+                        maxPlayers: server.maxPlayers,
+
+                        lastOnline: server.lastOnline,
+                        
+                        map: server.map,
+                        gametype: server.gametype
+                    });
+                }
+                res.json(found)
+            } else {
+                res.json({error: 'Servers not found'});
             }
         });
     });

@@ -119,7 +119,7 @@ var MinecraftServer = new Schema({
     nameLower           : String,
     id                  : String,
 
-    lastOnlineDate      : Number,
+    lastOnline          : Number,
     players             : [ObjectId],
     playerNames         : [String],
 
