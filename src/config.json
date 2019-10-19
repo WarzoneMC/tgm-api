@@ -1,0 +1,14 @@
+{
+    "server":{
+        "token": ""
+    },
+    "port": 3000,
+    "mongo": "mongodb://127.0.0.1:27017/tgm",
+    "collections": {
+        "users": "minecraft_users",
+        "ranks": "minecraft_ranks",
+        "punishments": "minecraft_punishments",
+        "matches": "minecraft_matches",
+        "maps": "minecraft_maps"
+    }
+}
