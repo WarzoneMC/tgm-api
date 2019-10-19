@@ -74,7 +74,7 @@ router.post('/login', isAuthenticated, async (req: Request, res: Response) => {
 router.get('/:id', async (req, res) => {
 	let player: any;
 	if (req.query.byName) {
-		player = await PlayerModel.findOne({ name: req.params.id });
+		player = await PlayerModel.findByName(req.params.id);
 		if (!player) res.status(404);
 	} else {
 		player = await PlayerModel.findById(req.params.id);

@@ -1,8 +1,17 @@
-import { prop, Typegoose, ModelType, InstanceType } from '@hasezoey/typegoose';
+import {
+	prop,
+	arrayProp,
+	Typegoose,
+	ModelType,
+	Ref,
+	staticMethod
+} from '@hasezoey/typegoose';
 
-class Player extends Typegoose {
+import { Rank } from './Rank';
+
+export class Player extends Typegoose {
 	@prop({ required: true })
-	_id!: string;
+	uuid!: string;
 
 	@prop({ required: true })
 	name!: string;
@@ -11,16 +20,16 @@ class Player extends Typegoose {
 	nameLower!: string;
 
 	@prop({ required: true })
-	lastJoinDate!: number;
-
-	@prop({ required: true })
 	initialJoinDate!: number;
 
 	@prop({ required: true })
+	lastJoinDate!: number;
+
+	@arrayProp({ required: true, items: Number })
 	ips!: number[];
 
-	@prop({ required: true })
-	ranks!: string[];
+	@arrayProp({ itemsRef: Rank })
+	ranks!: Ref<Rank>[];
 
 	@prop({ required: true })
 	matchesPlayed!: number;
@@ -36,6 +45,31 @@ class Player extends Typegoose {
 
 	@prop({ required: true })
 	deaths!: number;
+
+	@staticMethod
+	static async findByName(this: ModelType<Player>, name: string) {
+		return this.findOne({ nameLower: name.toLowerCase() })
+			.populate('ranks')
+			.exec();
+	}
+
+	@staticMethod
+	static async findById(this: ModelType<Player>, id: string) {
+		return this.findOne({ _id: id })
+			.populate('ranks')
+			.exec();
+	}
 }
 
-export default new Player().getModelForClass(Player);
+export default new Player().getModelForClass(Player, {
+	schemaOptions: {
+		toJSON: {
+			transform: (doc, ret, options) => {
+				delete ret.ips;
+				delete ret.matches;
+				delete ret.punishments;
+				return ret;
+			}
+		}
+	}
+});
