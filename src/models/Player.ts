@@ -8,6 +8,9 @@ class Player extends Typegoose {
 	name!: string;
 
 	@prop({ required: true })
+	nameLower!: string;
+
+	@prop({ required: true })
 	lastJoinDate!: number;
 
 	@prop({ required: true })
