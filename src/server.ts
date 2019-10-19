@@ -9,7 +9,8 @@ import * as mongoose from 'mongoose';
 const app = express();
 mongoose.connect(process.env.MONGO_URI || `mongodb://localhost:27017/warzone`, {
 	useNewUrlParser: true,
-	useUnifiedTopology: true
+	useUnifiedTopology: true,
+	useFindAndModify: false
 });
 
 app.use(helmet());
