@@ -11,6 +11,16 @@ router.post('/login', isAuthenticated, async (req: Request, res: Response) => {
 	if (!handleJoi(playerLogin, req, res)) return;
 
 	const uuid: string = req.body.id;
+	const name: string = req.body.name;
+
+	// if Player has other player's name, change existing account's name to null
+	var p = await PlayerModel.findOneAndUpdate(
+		{
+			nameLower: name.toLowerCase()
+		},
+		{ name: null, nameLower: null }
+	);
+	console.log(p);
 
 	let player = await PlayerModel.findById(uuid);
 	if (player) {
@@ -23,7 +33,8 @@ router.post('/login', isAuthenticated, async (req: Request, res: Response) => {
 			uuid,
 			{
 				ips,
-				name: req.body.name,
+				name,
+				nameLower: name.toLowerCase(),
 				lastJoinDate: Date.now()
 			},
 			{ new: true }
@@ -39,7 +50,8 @@ router.post('/login', isAuthenticated, async (req: Request, res: Response) => {
 		// Player has NOT logged in before
 		player = await PlayerModel.create({
 			_id: uuid,
-			name: req.body.name,
+			name,
+			nameLower: name.toLowerCase(),
 			lastJoinDate: Date.now(),
 			initialJoinDate: Date.now(),
 			ips: [simpleHash(req.body.ip)],
@@ -60,7 +72,7 @@ router.post('/login', isAuthenticated, async (req: Request, res: Response) => {
 });
 
 router.get('/:id', async (req, res) => {
-	let player;
+	let player: any;
 	if (req.query.byName) {
 		player = await PlayerModel.findOne({ name: req.params.id });
 		if (!player) res.status(404);
