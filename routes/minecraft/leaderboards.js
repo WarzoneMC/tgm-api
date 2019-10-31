@@ -78,5 +78,26 @@ module.exports = function(app) {
                 res.json(users);
             })
     });
+    
+    app.get('/mc/leaderboard/losses', function(req, res, next) {
+        var limit;
+        if (req.query.limit) {
+            try {
+                limit = parseInt(req.query.limit);
+                if (limit > 25) limit = 25;
+            } catch (err) {
+                limit = 25;
+            }
+        } else limit = 25;
+        MinecraftUser
+            .find({})
+            .sort('-losses')
+            .limit(limit)
+            .exec(function(err, users) {
+               if(err) console.log(err);
+
+                res.json(users);
+            })
+    });
 
 }
