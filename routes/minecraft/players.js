@@ -204,7 +204,7 @@ module.exports = function(app) {
         }
     });
 
-    app.get('/mc/player/alts/:name', async function(req, res) {
+    app.get('/mc/player/alts/:name', verifyServer, async function(req, res) {
         MinecraftUser.find({nameLower: req.params.name.toLowerCase()}).sort('-lastOnlineDate').limit(1).exec(async function(err, users) {
             if (err) console.error(err);
             var user = users[0];
