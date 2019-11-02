@@ -57,7 +57,8 @@ var MinecraftUser = new Schema({
     ranks                   : [ObjectId],
     ips                     : [String],
 
-
+    tags                     : [String],
+    activeTag                : String,
 
     kills                   : Number,
     deaths                  : Number,

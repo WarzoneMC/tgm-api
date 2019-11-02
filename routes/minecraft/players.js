@@ -362,4 +362,91 @@ module.exports = function(app) {
             }
         });
     });
+
+    app.post('/mc/player/:player/tags/add', verifyServer, function(req, res) {
+        var tag = req.body.tag;
+        if (!tag) {
+            res.status(400).json({ error: true, message: "Tag not included." });
+            return;
+        }
+        MinecraftUser.find({ nameLower: req.params.player.toLowerCase() }).sort('-lastOnlineDate').limit(1).exec((err, users) => {
+            var user = users[0];
+            if (!user) {
+                res.status(404).json({ error: true, message: "Player not found." });
+                return;
+            }
+            if (user.tags.includes(tag)) {
+                res.status(403).json({ error: true, message: "User already has that tag." });
+                return;
+            }
+            MinecraftUser.update({ _id: user._id }, {
+                $addToSet: { tags: tag }
+            }, (err) => {
+                user.tags.push(tag);
+                console.log('Added tag \'' + tag + '\' to ' + user.name + '\'s profile.');
+                res.json({tags: user.tags, activeTag: user.activeTag});
+                return;
+            });
+        });
+    });
+
+    app.post('/mc/player/:player/tags/remove', verifyServer, function(req, res) {
+        var tag = req.body.tag;
+        if (!tag) {
+            res.status(400).json({ error: true, message: "Tag not included." });
+            return;
+        }
+        MinecraftUser.find({ nameLower: req.params.player.toLowerCase() }).sort('-lastOnlineDate').limit(1).exec((err, users) => {
+            var user = users[0];
+            if (!user) {
+                res.status(404).json({ error: true, message: "Player not found." });
+                return;
+            }
+            var tags = user.tags;
+            if (!tags.includes(tag)) {
+                res.status(403).json({ error: true, message: "User does not have that tag." });
+                return;
+            }
+            tags.splice(tags.indexOf(tag), 1);
+            if (user.activeTag === tag) user.activeTag = null;
+            MinecraftUser.update({ _id: user._id }, {
+                tags, activeTag: user.activeTag
+            }, (err) => {
+                console.log('Removed tag \'' + tag + '\' removed ' + user.name + '\'s profile.');
+                res.json({tags: user.tags, activeTag: user.activeTag});
+                return;
+            });
+        });
+    });
+
+    app.post('/mc/player/:player/tags/set', verifyServer, function(req, res) {
+        var tag = req.body.tag;
+        MinecraftUser.find({ nameLower: req.params.player.toLowerCase() }).sort('-lastOnlineDate').limit(1).exec((err, users) => {
+            var user = users[0];
+            if (!user) {
+                res.status(404).json({ error: true, message: "Player not found." });
+                return;
+            }
+            if (tag && tag !== "") {
+                if (!user.tags.includes(tag)) {
+                    res.status(403).json({ error: true, message: "Tag not found." });
+                    return;
+                }
+                else if (user.activeTag === tag) {
+                    res.status(403).json({ error: true, message: "Already using that tag." });
+                    return;
+                }
+            } else {
+                tag = null;
+            }
+            MinecraftUser.update({ _id: user._id }, {
+                activeTag: tag
+            }, (err) => {
+                user.activeTag = tag;
+                console.log('Set active tag \'' + tag + '\' for ' + user.name + '\'s profile.');
+                res.json({tags: user.tags, activeTag: user.activeTag});
+                return;
+            });
+        });
+    });
 }
