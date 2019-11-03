@@ -109,6 +109,7 @@ let MinecraftRank = new Schema({
     name                : String,
     priority            : Number,
     prefix              : String,
+    display             : String,
     permissions         : [String],
     staff               : Boolean,
     default             : Boolean

@@ -50,8 +50,9 @@ module.exports = function (app) {
         }
         var rank = new MinecraftRank({
             name: req.body.name.toLowerCase(),
-            priority: req.body.priority,
             prefix: req.body.prefix,
+            display: req.body.display || req.body.name,
+            priority: req.body.priority,
             permissions: req.body.permissions,
             staff: req.body.staff,
             default: req.body.default
@@ -109,10 +110,11 @@ module.exports = function (app) {
                 }
                 var update = {};
                 if (req.params.field == 'prefix') update.prefix = req.body.value;
-                if (req.params.field == 'priority') update.priority = req.body.value;
-                if (req.params.field == 'permissions') update.permissions = req.body.value;
-                if (req.params.field == 'staff') update.staff = req.body.value;
-                if (req.params.field == 'default') update.default = req.body.value;
+                else if (req.params.field == 'display') update.display = req.body.value;
+                else if (req.params.field == 'priority') update.priority = req.body.value;
+                else if (req.params.field == 'permissions') update.permissions = req.body.value;
+                else if (req.params.field == 'staff') update.staff = req.body.value;
+                else if (req.params.field == 'default') update.default = req.body.value;
 
                 console.log(update);
                 
@@ -130,10 +132,11 @@ module.exports = function (app) {
                 }
                 var update = {};
                 if (req.params.field == 'prefix') update.prefix = req.body.value;
-                if (req.params.field == 'priority') update.priority = req.body.value;
-                if (req.params.field == 'permissions') update.permissions = req.body.value;
-                if (req.params.field == 'staff') update.staff = req.body.value;
-                if (req.params.field == 'default') update.default = req.body.value;
+                else if (req.params.field == 'display') update.display = req.body.value;
+                else if (req.params.field == 'priority') update.priority = req.body.value;
+                else if (req.params.field == 'permissions') update.permissions = req.body.value;
+                else if (req.params.field == 'staff') update.staff = req.body.value;
+                else if (req.params.field == 'default') update.default = req.body.value;
 
                 console.log(update);
 
