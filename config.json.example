@@ -1,0 +1,13 @@
+{
+    "key": {
+        "privateKey": ""
+    },
+   "server":{
+        "token": "YOUR_PRIVATE_TOKEN"
+    },
+    "email": {
+        "username": ""
+    },
+    "port": 3000,
+    "mongo": "YOUR_MONGO_URI"
+}
