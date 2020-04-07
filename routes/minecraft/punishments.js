@@ -192,30 +192,20 @@ module.exports = function(app) {
             var punishments = new Array();
             async.eachSeries(puns, function (pun, next) {
                 var punishment = pun.toJSON();
-                MinecraftUser.findOne({_id: pun.punisher}, function(err, punisher){
+                MinecraftUser.findOne({_id: pun.punished}, function(err, punished){
                     if (err) console.log(err);
-                    if (punisher) {
-                        var punisherLoaded = punisher.toJSON();
-                        delete punisherLoaded.matches;
-                        punishment.punisherLoaded = punisherLoaded;
+                    if (punished) {
+                        var punishedLoaded = punished.toJSON();
+                        delete punishedLoaded.matches;
+                        punishment.punishedLoaded = punishedLoaded;
                     } else {
-                        punishment.punisherLoaded = null;
+                        punishment.punishedLoaded = null;
                     }
-                    MinecraftUser.findOne({_id: pun.punished}, function(err, punished){
-                        if (err) console.log(err);
-                        if (punished) {
-                            var punishedLoaded = punished.toJSON();
-                            delete punishedLoaded.matches;
-                            punishment.punishedLoaded = punishedLoaded;
-                        } else {
-                            punishment.punishedLoaded = null;
-                        }
-                        delete punishment.ip;
-                        punishments.push(punishment);
-                        next();
-                    })
+                    delete punishment.punisher;
+                    delete punishment.ip;
+                    punishments.push(punishment);
+                    next();
                 })
-                
             }, function(err) {
                 res.json(punishments);
             });
