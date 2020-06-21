@@ -104,15 +104,10 @@ module.exports = function (app) {
                             res.json({})
                         });
 
-                        MinecraftUser.update({_id: {$in: fixedWinners}}, {$inc: {wins: 1}}, {multi: true}, function(err) {
+                        MinecraftUser.update({_id: {$in: fixedWinners}}, {$inc: {wins: 1, matches: 1}}, {multi: true}, function(err) {
                             if(err) console.log(err);
-                            MinecraftUser.update({_id: {$in: fixedLosers}}, {$inc: {losses: 1}}, {multi: true}, function(err) {
+                            MinecraftUser.update({_id: {$in: fixedLosers}}, {$inc: {losses: 1, matches: 1}}, {multi: true}, function(err) {
                                 if(err) console.log(err);
-
-                                MinecraftUser.update({_id: {$in: allUserIds}},
-                                    {$addToSet: {matches: mongoose.Types.ObjectId(req.body.id)}}, {multi: true}, function(err) {
-                                    if(err) console.log(err);
-                                })
                             })
                         })
                     })
@@ -124,7 +119,7 @@ module.exports = function (app) {
     app.get('/mc/match/latest/:playerName', function(req, res, next) {
         MinecraftUser.findOne({nameLower: req.params.playerName.toLowerCase()}, function(err, user) {
             MinecraftMatch
-                .find({_id: {$in: user.matches}})
+                .find({$or: [{winners: user._id}, {losers: user._id}]})
                 .limit(5)
                 .sort('-finishedDate')
                 .exec(function(err, matches) {

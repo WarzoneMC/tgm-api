@@ -13,6 +13,7 @@ var MinecraftPunishment = mongoose.model('minecraft_punishment');
 module.exports = function(app) {
 
     app.get('/mc/player/:name', function(req, res, next) {
+        let simple = req.query.simple;
         var query;
         if (req.query.byUUID) {
             query = {uuid: req.params.name}
@@ -31,7 +32,7 @@ module.exports = function(app) {
 
                 async.series([
                     function(callback) {
-                        if(true) {
+                        if (!simple) {
                             console.log('including deaths in player response.');
                             MinecraftDeath
                                 .find({$or: [{player: user._id}, {killer: user._id}]})
@@ -77,9 +78,9 @@ module.exports = function(app) {
                     },
                     // Fill in matches
                     function(callback) {
-                        if (true) {
+                        if (!simple) {
                             MinecraftMatch
-                                .find({matches: {$in: user.matches}})
+                                .find({$or: [{winners: user._id}, {losers: user._id}]})
                                 .sort('-finishedDate')
                                 .limit(10)
                                 .exec(function(err, foundMatches) {
