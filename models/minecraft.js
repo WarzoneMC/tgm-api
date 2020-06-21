@@ -57,8 +57,8 @@ var MinecraftUser = new Schema({
     ranks                   : [ObjectId],
     ips                     : [String],
 
-    tags                     : [String],
-    activeTag                : String,
+    tags                    : [String],
+    activeTag               : String,
 
     kills                   : Number,
     deaths                  : Number,
@@ -67,7 +67,7 @@ var MinecraftUser = new Schema({
     matches                 : Number,
     
     wool_destroys           : Number,
-    wool_pickups			      : Number,
+    wool_pickups            : Number,
     wool_placements         : Number,
 
     punishments             : [MinecraftPunishment]
