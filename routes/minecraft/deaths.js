@@ -1,3 +1,4 @@
+const Common = require('../../util/common');
 var mongoose = require('mongoose');
 var verifyServer = require('./verifyServer');
 var async = require('async');
@@ -6,22 +7,6 @@ var MinecraftUser = mongoose.model('minecraft_user');
 var MinecraftDeath = mongoose.model('minecraft_death');
 
 module.exports = function(app) {
-
-    var matchPlayerWithId = function(players, id, callback) {
-        if(id == null) {
-            return callback(null);
-        }
-        async.eachSeries(players, function(player, next) {
-            if(player._id.toString() == id.toString()) {
-                console.log('found player [' + player.name + ']')
-                callback(player);
-            } else {
-                next();
-            }
-        }, function(err) {
-            callback(null);
-        })
-    }
 
     app.get('/mc/death/latest', function(req, res) {
         MinecraftDeath

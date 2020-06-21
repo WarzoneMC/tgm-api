@@ -3,17 +3,18 @@ var nodemailer = require('nodemailer'),
     algorithm = 'aes-256-ctr';
 var async = require('async');
 
-var privateKey = config.key.privateKey;
+// var privateKey = config.key.privateKey;
 
 // create reusable transport method (opens pool of SMTP connections)
 // console.log(Config.email.username+'  '+Config.email.password);
-var smtpTransport = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-        user: config.email.username,
-        pass: config.email.password
-    }
-});
+
+// var smtpTransport = nodemailer.createTransport({
+//     service: 'Gmail',
+//     auth: {
+//         user: config.email.username,
+//         pass: config.email.password
+//     }
+// });
 
 exports.decrypt = function(password) {
     return decrypt(password);
@@ -23,21 +24,21 @@ exports.encrypt = function(password) {
     return encrypt(password);
 };
 
-exports.sendMailVerificationLink = function(user, token) {
-    var textLink = 'http://warz.one/verify/' + token;
-    var from = config.email.accountName+' Team<' + config.email.username + '>';
-    var mailbody = '<p>Thanks for Registering on ' + config.email.accountName + ' </p><p>Please verify your email by clicking on the verification link below.<br/><a href=' + textLink.toString()
-        + '>Verification Link</a></p>';
+// exports.sendMailVerificationLink = function(user, token) {
+//     var textLink = 'http://warz.one/verify/' + token;
+//     var from = config.email.accountName+' Team<' + config.email.username + '>';
+//     var mailbody = '<p>Thanks for Registering on ' + config.email.accountName + ' </p><p>Please verify your email by clicking on the verification link below.<br/><a href=' + textLink.toString()
+//         + '>Verification Link</a></p>';
 
-    // mail(from, user.username , 'Account Verification', mailbody);
-    mail(from, 'chattonluke@gmail.com' , 'Account Verification', mailbody);
-};
+//     // mail(from, user.username , 'Account Verification', mailbody);
+//     mail(from, 'chattonluke@gmail.com' , 'Account Verification', mailbody);
+// };
 
-exports.sendMailForgotPassword = function(user) {
-    var from = config.email.accountName+' Team<' + config.email.username + '>';
-    var mailbody = '<p>Your ' + config.email.accountName + '  Account Credential</p><p>username : ' + user.username + ' , password : ' + decrypt(user.password)+'</p>'
-    mail(from, user.email , 'Account password', mailbody);
-};
+// exports.sendMailForgotPassword = function(user) {
+//     var from = config.email.accountName+' Team<' + config.email.username + '>';
+//     var mailbody = '<p>Your ' + config.email.accountName + '  Account Credential</p><p>username : ' + user.username + ' , password : ' + decrypt(user.password)+'</p>'
+//     mail(from, user.email , 'Account password', mailbody);
+// };
 
 
 // method to decrypt data(password)
@@ -64,22 +65,22 @@ exports.removeDuplicates = function(array) {
     return [...new Set(array)]
 }
 
-function mail(from, email, subject, mailbody){
-    var mailOptions = {
-        from: from, // sender address
-        to: email, // list of receivers
-        subject: subject, // Subject line
-        //text: result.price, // plaintext body
-        html: mailbody  // html body
-    };
+// function mail(from, email, subject, mailbody){
+//     var mailOptions = {
+//         from: from, // sender address
+//         to: email, // list of receivers
+//         subject: subject, // Subject line
+//         //text: result.price, // plaintext body
+//         html: mailbody  // html body
+//     };
 
-    smtpTransport.sendMail(mailOptions, function(error, response) {
-        if (error) {
-            console.error(error);
-        }
-        smtpTransport.close(); // shut down the connection pool, no more messages
-    });
-}
+//     smtpTransport.sendMail(mailOptions, function(error, response) {
+//         if (error) {
+//             console.error(error);
+//         }
+//         smtpTransport.close(); // shut down the connection pool, no more messages
+//     });
+// }
 
 exports.matchPlayerWithId = function(players, id, callback) {
     if(id == null) {
