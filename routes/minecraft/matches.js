@@ -1,3 +1,4 @@
+const Common = require('../../util/common');
 var mongoose = require('mongoose');
 var verifyServer = require('./verifyServer');
 var async = require('async');
