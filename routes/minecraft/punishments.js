@@ -148,7 +148,7 @@ module.exports = function(app) {
                     }, {
                         ip: req.body.ip
                     }]
-                } : {punished: user._id}).exec(function(err, punishments) {
+                } : {$or: [{punished: user._id}, {ip: {$in: user.ips}}]}).exec(function(err, punishments) {
                     if (err) console.log(err);
                     for (var i in punishments) {
                         var punishment = punishments[i];
