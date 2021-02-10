@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var verifyServer = require('./verifyServer');
 var async = require('async');
+const { webhookIssuePunishment, webhookRevertPunishment } = require('../../util/webhooks');
 
 var MinecraftUser = mongoose.model('minecraft_user');
 var MinecraftPunishment = mongoose.model('minecraft_punishment');
@@ -40,6 +41,7 @@ module.exports = function(app) {
                                 
                                 name: punished.name
                             });
+                            webhookIssuePunishment(punishment, punished, punisher);
                         });
                         
                     });
@@ -75,6 +77,7 @@ module.exports = function(app) {
                             kickable: punishment.shouldKick(),
                             ip: punishment.ip
                         });
+                        webhookIssuePunishment(punishment, undefined, punisher);
                     });
                 } else {
                     res.json({notFound: true});
@@ -100,6 +103,7 @@ module.exports = function(app) {
                         MinecraftUser.findOne({_id: id}, function (err, user) {
                             loadedUsers.push({
                                 name: user.name,
+                                uuid: user.uuid,
                                 id: user._id
                             });
                             next();
@@ -111,6 +115,7 @@ module.exports = function(app) {
                             loadedUsers: loadedUsers,
                             success: success
                         });
+                        webhookRevertPunishment(punishment, loadedUsers);
                         console.log('Reverted punishment: ' + punishment._id); 
                     });
                     

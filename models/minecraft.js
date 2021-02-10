@@ -40,6 +40,10 @@ MinecraftPunishment.methods.shouldKick = function() {
     return this.type.toLowerCase() === 'ban' || this.type.toLowerCase() === 'kick';
 };
 
+MinecraftPunishment.methods.isTimed = function() {
+    return this.type.toLowerCase() === 'ban' || this.type.toLowerCase() === 'mute';
+};
+
 MinecraftPunishment.methods.isBan = function() {
     return this.type.toLowerCase() === 'ban';
 };
