@@ -24,7 +24,7 @@ function webhookIssuePunishment(punishment, punished, punisher) {
             .setThumbnail(thumbnail)
             .addField("ID", '`' + punishment._id + '`', true)
             .addField("Type", '`' + type + '`', true)
-            .addField("Punished Player", punishedName, false)
+            .addField("Punished Player", "`" + punishedName + "`", false)
     if (punishment.isTimed()) {
         msg.addField("Expires", time, false)
     }
@@ -46,7 +46,7 @@ function webhookRevertPunishment(punishment, loadedUsers) {
             .setThumbnail(thumbnail)
             .addField("ID", '`' + punishment._id + '`', true)
             .addField("Type", '`'+ type + '`', true)
-            .addField("Punished " + (punished ? "Player" : "IP"), punishedName, false)
+            .addField("Punished " + (punished ? "Player" : "IP"), "`" + punishedName + "`", false)
             .addField("Reason", punishment.reason, false);
     punishmentsHook.send(msg);
 }
