@@ -15,7 +15,7 @@ function webhookIssuePunishment(punishment, punished, punisher) {
     let icon = punisher ? "https://crafatar.com/avatars/" + punisher.uuid + "?helm&size=50": undefined;
     let thumbnail = punished ? "https://crafatar.com/avatars/" + punished.uuid + "?helm&size=50" : undefined;
     console.log(thumbnail);
-    let time = timeUntil(new Date(punishment.expires + 1000)).string;
+    let time = punishment.expires < 0 ? "Never" : timeUntil(new Date(punishment.expires + 1000)).string;
     const msg = new MessageBuilder()
             .setName("Punishment")
             .setColor("#3492eb")
