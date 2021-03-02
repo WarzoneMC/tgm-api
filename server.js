@@ -29,6 +29,7 @@ require('./routes/minecraft/matches')(app);
 require('./routes/minecraft/deaths')(app);
 require('./routes/minecraft/ranks')(app);
 require('./routes/minecraft/punishments')(app);
+require('./routes/minecraft/reports')(app);
 
 const port = process.env.PORT || config.port || 3000;
 app.listen(port, () => console.log('API server started on port ' + port));

@@ -108,3 +108,21 @@ exports.toMMSS = function (sec_num) {
     if (seconds < 10) {seconds = '0'+seconds;}
     return minutes + ':' + seconds;
 }
+
+const markdownReplacements = [
+  [/\*/g, '\\*'],
+  [/#/g, '\\#'],
+  [/\//g, '\\/'],
+  [/\(/g, '\\('],
+  [/\)/g, '\\)'],
+  [/\[/g, '\\['],
+  [/\]/g, '\\]'],
+  [/</g, '&lt;'],
+  [/>/g, '&gt;'],
+  [/_/g, '\\_']
+]
+
+exports.escapeMarkdown = function (string) {
+  return markdownReplacements.reduce((string, replacement) => 
+    string.replace(replacement[0], replacement[1]), string)
+}
