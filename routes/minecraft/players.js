@@ -15,7 +15,7 @@ module.exports = function(app) {
     app.get('/mc/player/:name', function(req, res, next) {
         let simple = req.query.simple;
         var query;
-        if (req.query.byUUID === ('true'||'false') && Boolean(req.query.byUUID)) {
+        if (req.query.byUUID === 'true') {
             query = {uuid: req.params.name}
         } else {
             query = {nameLower: req.params.name.toLowerCase()};
