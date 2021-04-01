@@ -22,7 +22,7 @@ function webhookNewReport(
   if (!reports) return;
   const msg = new MessageBuilder()
     .setName('In-Game Reports')
-    .setColor('#ffff00')
+    .setColor('#aa00aa')
     .setTitle('New report')
     .addField('Reported', escapeMarkdown(reportedName), true)
     .addField('Reporter', escapeMarkdown(reporterName), true)
