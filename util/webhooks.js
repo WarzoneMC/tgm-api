@@ -10,8 +10,8 @@ let reportsHook;
 if (reports) reportsHook = new Webhook(reports);
 
 function webhookNewReport(
-  reporterName,
   reportedName,
+  reporterName,
   reporterUuid,
   reportedUuid,
   reason,
@@ -24,8 +24,8 @@ function webhookNewReport(
     .setName('In-Game Reports')
     .setColor('#ffff00')
     .setTitle('New report')
-    .addField('Reported', reportedName, true)
-    .addField('Reporter', reporterName, true)
+    .addField('Reported', escapeMarkdown(reportedName), true)
+    .addField('Reporter', escapeMarkdown(reporterName), true)
     .addField('\u200B', '\u200B', true)
     .addField('Reason', escapeMarkdown(reason.substr(0, 200)), true)
     .addField('Online staff', onlineStaff.map(s => escapeMarkdown(s)).join('\n'), true)
