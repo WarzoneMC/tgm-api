@@ -8,7 +8,7 @@ Warzone's HTTP backend implementation.
     "server":{
         "token": "YOUR_TOKEN"
     },
-    webhooks:[
+    "webhooks":[
         "PUNISHMENTS_URL",
         "REPORTS_URL"
     ],
