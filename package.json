@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/WarzoneMC/API#readme",
   "dependencies": {
-    "express": "^4.15.2",
+    "express": "^4.17.3",
     "jsonwebtoken": "^7.4.0",
     "mongoose": "^4.9.7",
     "morgan": "^1.8.1",
