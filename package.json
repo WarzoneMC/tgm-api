@@ -19,7 +19,7 @@
   "homepage": "https://github.com/WarzoneMC/API#readme",
   "dependencies": {
     "express": "^4.15.2",
-    "jsonwebtoken": "^7.4.0",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^4.9.7",
     "morgan": "^1.8.1",
     "nodemailer": "^4.0.1",
